@@ -120,13 +120,12 @@ class ElectionAuthority (models.Model):
     """
     An administrator who acts as a validator and tabulator of an Election, but cannot set the parameters of an Election.
     """
-
     user_id = models.CharField(max_length=100)
-    public_key = models.TextField()
+    public_key = models.TextField(blank=True)
     election = models.ForeignKey(Election, related_name="authorities")
-    election_signature = models.TextField()
-    ballot_signature = models.TextField()
-    approved = models.BooleanField()
+    election_signature = models.TextField(blank=True)
+    ballot_signature = models.TextField(blank=True)
+    approved = models.BooleanField(default=False)
 
     def _verify_signature(self):
         """
@@ -234,6 +233,15 @@ class WriteInCandidate (Candidate):
     class Meta:
         verbose_name = 'Write-in Candidate'
         ordering = ['race', 'name']
+
+class SealedVote (models.Model):
+    """
+    A finished vote uploaded by a voter.
+    """
+    user_id = models.CharField(max_length=100)
+    poll = models.ForeignKey(Poll)
+    ballot = BallotField()
+    signature = models.TextField()
     
 class Ballot (str):
     """
@@ -250,12 +258,3 @@ class Ballot (str):
 
     class Meta:
         abstract = True
-
-class SealedVote (models.Model):
-    """
-    A finished vote uploaded by a voter.
-    """
-    user_id = models.CharField(max_length=100)
-    poll = models.ForeignKey(Poll)
-    ballot = models.TextField()
-    signature = models.TextField()
