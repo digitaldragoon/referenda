@@ -16,3 +16,7 @@ admin.site.register(BallotCandidate, BallotCandidateAdmin)
 class WriteInCandidateAdmin(admin.ModelAdmin):
     pass
 admin.site.register(WriteInCandidate, WriteInCandidateAdmin)
+
+class ElectionAuthorityAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(ElectionAuthority, ElectionAuthorityAdmin)

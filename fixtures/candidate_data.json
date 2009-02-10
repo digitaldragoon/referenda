@@ -1,0 +1,7 @@
+[
+{"pk": 1, "model": "referenda.poll", "fields": {"name": "My Election", "poll_closes": "2009-02-07 01:32:09", "_child_type": "Election", "empty_ballot": "", "active": true, "inactive_notice": "", "slug": "my-election", "poll_opens": "2009-02-07 01:32:09"}},
+{"pk": 1, "model": "referenda.election", "fields": {}},
+{"pk": 1, "model": "referenda.race", "fields": {"name": "My Race", "slug": "my-race", "election": 1}},
+{"pk": 1, "model": "referenda.candidate", "fields": {"_child_type": "BallotCandidate", "race": 1}},
+{"pk": 1, "model": "referenda.ballotcandidate", "fields": {"bio": "No bio", "first_name": "Stefan", "last_name": "Moluf", "race": 1}}
+]
