@@ -1,6 +1,29 @@
 from datetime import datetime
 from django.db import models
 
+################################################################################
+# FIELDS
+################################################################################
+
+class BallotField(models.TextField):
+    """
+    Field which transparently translates between database strings and Python Ballot objects.
+    """
+
+    def to_python(self, value):
+        if isinstance(value, Ballot):
+            return value
+
+        elif isinstance(value, str):
+            return Ballot(value)
+
+        else:
+            raise TypeError, 'cannot translate value into type Ballot'
+
+################################################################################
+# MODELS
+################################################################################
+
 class Poll (models.Model):
     """
     The superclass for all types of polls.
@@ -11,7 +34,7 @@ class Poll (models.Model):
     poll_closes = models.DateTimeField(default=datetime.now())
     active = models.BooleanField(help_text="Should this poll open? (disable to make changes before re-opening poll)", default=True)
     inactive_notice = models.TextField(help_text="Message to display when the polls have opened but the poll has been marked as inactive. Use this to announce period of maintenance or repair.", blank=True)
-    empty_ballot = models.TextField(blank=True)
+    empty_ballot = BallotField(blank=True)
 
     _child_type = models.CharField(max_length=30, editable=False)
     def _get_child(self):
@@ -32,13 +55,6 @@ class Poll (models.Model):
         Create a ballot from the parameters of the poll. Subclasses must implement this.
         """
         raise NotImplementedError, "subclasses must implement generate_ballot()"
-
-    def destroy_ballot (self):
-        """
-        Destroy the current ballot.
-        """
-        self.empty_ballot = ""
-        self.save()
 
     def save(self):
         self._child_type = self.__class__.__name__
@@ -237,7 +253,7 @@ class Ballot (str):
 
 class SealedVote (models.Model):
     """
-    A finished ballot uploaded by a voter.
+    A finished vote uploaded by a voter.
     """
     user_id = models.CharField(max_length=100)
     poll = models.ForeignKey(Poll)
