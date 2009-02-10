@@ -221,9 +221,8 @@ class WriteInCandidate (Candidate):
     
 class Ballot (str):
     """
-    A string representation of an Election ballot. Note that ballots are immutable.
+    A string representation of an Election ballot. Note that ballots are immutable. Polls should be responsible for the code that generates a given ballot.
     """
-    data = models.TextField()
 
     def _compute_hash(self):
         """
