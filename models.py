@@ -9,16 +9,27 @@ class BallotField(models.TextField):
     """
     Field which transparently translates between database strings and Python Ballot objects.
     """
+    __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
         if isinstance(value, Ballot):
             return value
 
-        elif isinstance(value, str):
+        elif isinstance(value, unicode) or isinstance(value, str):
             return Ballot(value)
 
         else:
-            raise TypeError, 'cannot translate value into type Ballot'
+            raise TypeError, 'cannot translate value of type "%s" into value of type "Ballot"' % value.__class__.__name__
+
+    def get_db_prep_value(self, value):
+        if value == None:
+            return ''
+        
+        elif isinstance(value, Ballot):
+            return unicode(value)
+
+        else:
+            raise TypeError, 'value is not of type "Ballot"'
 
 ################################################################################
 # MODELS
@@ -34,7 +45,7 @@ class Poll (models.Model):
     poll_closes = models.DateTimeField(default=datetime.now())
     active = models.BooleanField(help_text="Should this poll open? (disable to make changes before re-opening poll)", default=True)
     inactive_notice = models.TextField(help_text="Message to display when the polls have opened but the poll has been marked as inactive. Use this to announce period of maintenance or repair.", blank=True)
-    empty_ballot = BallotField(blank=True)
+    ballot = BallotField(blank=True)
 
     _child_type = models.CharField(max_length=30, editable=False)
     def _get_child(self):
@@ -204,7 +215,7 @@ class BallotCandidate (Candidate):
     """
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    bio = models.CharField(max_length=500)
+    bio = models.CharField(max_length=500, blank=True)
 
     def _get_full_name(self):
         return "%s %s" % (self.first_name, self.last_name)
@@ -243,7 +254,7 @@ class SealedVote (models.Model):
     ballot = BallotField()
     signature = models.TextField()
     
-class Ballot (str):
+class Ballot (unicode):
     """
     A string representation of an Election ballot. Note that ballots are immutable. Polls should be responsible for the code that generates a given ballot.
     """
