@@ -1,15 +1,6 @@
 from datetime import datetime
 from django.db import models
 
-class TrackedModel:
-    """
-    Non-Django superclass for models which will be tracked by an access log. Provides convenience methods for logging.
-    """
-    pass
-
-class AccessLog (models.Model):
-    pass
-
 class Poll (models.Model):
     """
     The superclass for all types of polls.
