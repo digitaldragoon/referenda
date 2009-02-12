@@ -1,0 +1,66 @@
+/*------------------------------------------------------------------------------
+ * MAIN BLOCKS
+ *----------------------------------------------------------------------------*/
+
+html
+{
+    background: #5a0000;
+    background: #5e5e5e url("../img/bkgd.png") top left repeat-x;
+}
+
+#frame
+{
+    background-color: #ffffff;
+}
+#frame div.bkgd
+{
+    background-repeat: repeat-y;
+}
+#frame div.bkgd.left
+{
+    background-image: url("../img/frame_shadow_left.png");
+}
+#frame div.bkgd.right
+{
+    background-image: url("../img/frame_shadow_right.png");
+}
+
+#header
+{
+    background: transparent url("../img/header.png") top left no-repeat;
+}
+
+#content-pane
+{
+    background-color: #fff;
+}
+
+#inner-frame
+{
+    background: transparent url("../img/inner_frame_bkgd.png") top left repeat-y;
+}
+
+#inner-frame .cap.top
+{
+    background: url("../img/inner_frame_cap_top.png") bottom left no-repeat;
+}
+
+#inner-frame .cap.bottom
+{
+    background: url("../img/inner_frame_cap_bottom.png") bottom left no-repeat;
+}
+
+
+/*------------------------------------------------------------------------------
+ * ELEMENTS
+ *----------------------------------------------------------------------------*/
+
+a img
+{
+    border: none;
+}
+
+a
+{
+    color: #6156ca;
+}

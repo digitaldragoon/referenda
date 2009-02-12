@@ -1,0 +1,99 @@
+/*------------------------------------------------------------------------------
+ * MAIN BLOCKS
+ *----------------------------------------------------------------------------*/
+
+html,
+body
+{
+    height: 100%;
+}
+
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+#frame
+{
+    position: relative;
+    min-height: 100%;
+    width: 900px;
+    margin: 0 auto;
+}
+#frame div.bkgd
+{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 29px;
+}
+#frame div.bkgd.left
+{
+    left: -29px;
+}
+#frame div.bkgd.right
+{
+    right: -29px;
+}
+
+#content-pane
+{
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    padding-bottom: 50px;
+}
+
+#header
+{
+    position: relative;
+    height: 120px;
+    width: 100%;
+    z-index: 30;
+}
+
+#logo
+{
+    position: absolute;
+    top: 30px;
+    left: 15px;
+}
+
+#inner-frame
+{
+    width: 876px;
+    margin: 20px 11px;
+}
+
+#inner-frame .cap
+{
+    width: 100%;
+    height: 20px;
+}
+
+#main
+{
+    padding: 0 20px;
+    min-height: 180px;
+}
+
+.clear
+{
+    clear: both;
+}
+
+/*------------------------------------------------------------------------------
+ * ELEMENTS
+ *----------------------------------------------------------------------------*/
+.column.long
+{
+    float: left;
+    width: 540px;
+}
+
+.column.short
+{
+    float: right;
+    width: 280px;
+}

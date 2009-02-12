@@ -1,0 +1,14 @@
+#frame
+{
+    height: 100%;
+}
+
+#frame .bkgd
+{
+    display: none;
+}
+
+#main
+{
+    height: 180px;
+}

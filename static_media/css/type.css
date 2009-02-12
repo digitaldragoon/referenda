@@ -1,0 +1,38 @@
+*
+{
+    font-family: "verdana", sans-serif;
+}
+
+h1, h2, h3, h4, h5,
+h1 *, h2 *, h3 *, h4 *, h5 *,
+a,
+label,
+.link-style
+{
+    font-weight: normal;
+}
+
+h1
+{
+    width: 100%;
+    border-bottom: 1px solid;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+p
+{
+    font-size: 12px;
+}
+
+a,
+button
+{
+    font-weight: bold;
+    text-decoration: none;
+}
+
+dt
+{
+    font-weight: bold;
+}
