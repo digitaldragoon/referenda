@@ -5,7 +5,7 @@
 
 h1, h2, h3, h4, h5,
 h1 *, h2 *, h3 *, h4 *, h5 *,
-a,
+h1 a, h2 a, h3 a,
 label,
 .link-style
 {
@@ -27,9 +27,17 @@ h2
     font-size: 18px;
     margin-bottom: 8px;
 }
-* + h2
+h2
 {
     margin-top: 20px;
+}
+
+span.annotation
+{
+    font-size: 10px;    
+    line-height: 18px;
+    vertical-align: middle;
+    padding: 2px 0 6px 0;
 }
 
 p
@@ -43,6 +51,11 @@ button
 {
     font-weight: bold;
     text-decoration: none;
+}
+a:hover,
+a:active
+{
+    text-decoration: underline;
 }
 
 dt

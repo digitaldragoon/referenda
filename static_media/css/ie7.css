@@ -1,4 +1,9 @@
 #advanced-panel
 {
-    width: 740px;
+    width: 700px;
+}
+
+li.election.hover
+{
+    background-position: 5px 15px;
 }

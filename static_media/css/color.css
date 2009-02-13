@@ -61,6 +61,23 @@ html
  * ELEMENTS
  *----------------------------------------------------------------------------*/
 
+ul
+{
+    list-style: none;
+}
+
+li.election
+{
+    background: url("../img/list_bullet.png") no-repeat 5px 15px;
+}
+li.election.hover
+{
+    background-color: #eeeeee;
+    background-position: 4px 14px;
+    border: 1px #1a1a1a dotted;
+    cursor: pointer;
+}
+
 a img
 {
     border: none;
@@ -69,4 +86,9 @@ a img
 a
 {
     color: #6156ca;
+}
+
+.grey
+{
+    color: #888888;
 }

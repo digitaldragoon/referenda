@@ -107,6 +107,16 @@ body
     left: -54px;
 }
 
+li.election
+{
+    padding: 8px 8px 8px 25px;
+}
+li.election.hover
+{
+    border: 1px #1a1a1a dashed;
+    padding: 7px 7px 7px 24px;
+}
+
 .column.long
 {
     float: left;
