@@ -50,6 +50,12 @@ html
     background: url("../img/inner_frame_cap_bottom.png") bottom left no-repeat;
 }
 
+#advanced-panel
+{
+    background: #c1c8d0;
+    border-left: 20px #1a1a1a solid;
+}
+
 
 /*------------------------------------------------------------------------------
  * ELEMENTS

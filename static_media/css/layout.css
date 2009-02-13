@@ -62,8 +62,10 @@ body
 
 #inner-frame
 {
+    position: relative;
     width: 876px;
     margin: 20px 11px;
+    overflow: hidden;
 }
 
 #inner-frame .cap
@@ -75,7 +77,18 @@ body
 #main
 {
     padding: 0 20px;
-    min-height: 180px;
+    min-height: 300px;
+}
+
+#advanced-panel
+{
+    width: 700px;
+    margin-left: -800px;
+    position: relative;
+    float: right;
+    padding: 20px 20px 10020px 20px;
+    position: relative;
+    margin-bottom: -10000px;
 }
 
 .clear
@@ -86,6 +99,14 @@ body
 /*------------------------------------------------------------------------------
  * ELEMENTS
  *----------------------------------------------------------------------------*/
+
+#advanced-panel .button
+{
+    position: absolute;
+    top: 0;
+    left: -54px;
+}
+
 .column.long
 {
     float: left;
@@ -96,4 +117,9 @@ body
 {
     float: right;
     width: 280px;
+}
+
+.clear + .column
+{
+    margin-top: 20px;
 }

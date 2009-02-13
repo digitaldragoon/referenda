@@ -1,0 +1,14 @@
+{% extends "referenda/base.html" %}
+
+{% block script %}
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/panel.js"></script>
+{% endblock %}
+
+{% block advanced-panel %}
+<div id="advanced-panel" style="right: -760px">
+    <a class="button"><img alt="Advanced control panel" src="{{ REFERENDA_MEDIA_PREFIX}}/img/controlpanel_button.png" width="54" height="99"/></a>
+    <h1>Advanced Control Panel</h1>
+    <p>This control panel gives you access to everything that's going on "under the hood" in Referenda. WARNING: IF YOU DON'T KNOW WHAT YOU'RE DOING, YOU CAN VERY EASILY RUIN YOUR VOTE.</p>
+    <p>If you don't know what ElGamal encryption and public-key cryptography are, you should leave this panel alone.</p>
+</div>
+{% endblock %}

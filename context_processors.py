@@ -1,3 +1,10 @@
 def settings(request):
     from django.conf import settings
-    return {'REFERENDA_MEDIA_PREFIX': settings.REFERENDA_MEDIA_PREFIX}
+
+    dict = {}
+    try:
+        dict['REFERENDA_MEDIA_PREFIX'] = settings.AREFERENDA_MEDIA_PREFIX
+    except AttributeError:
+        dict['REFERENDA_MEDIA_PREFIX'] = settings.MEDIA_URL
+
+    return dict
