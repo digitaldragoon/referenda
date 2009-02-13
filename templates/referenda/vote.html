@@ -6,9 +6,20 @@
 
 {% block advanced-panel %}
 <div id="advanced-panel" style="right: -760px">
-    <a class="button"><img alt="Advanced control panel" src="{{ REFERENDA_MEDIA_PREFIX}}/img/controlpanel_button.png" width="54" height="99"/></a>
+    <a class="button"><img alt="" src="{{ REFERENDA_MEDIA_PREFIX}}/img/controlpanel_button.png" width="54" height="99"/></a>
     <h1>Advanced Control Panel</h1>
     <p>This control panel gives you access to everything that's going on "under the hood" in Referenda. WARNING: IF YOU DON'T KNOW WHAT YOU'RE DOING, YOU CAN VERY EASILY RUIN YOUR VOTE.</p>
     <p>If you don't know what ElGamal encryption and public-key cryptography are, you should leave this panel alone.</p>
+</div>
+{% endblock %}
+
+{% block main %}
+<div class="column long">
+    <h1>ASUPS Spring Elections (2009)</h1>
+    <h2>ASUPS Vice President (choose one)</h2>
+    <p>Choose any one candidate.</p>
+</div>
+<div class="column short">
+    <h1>Progress</h1>
 </div>
 {% endblock %}

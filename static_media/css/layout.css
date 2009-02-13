@@ -76,7 +76,7 @@ body
 
 #main
 {
-    padding: 0 20px;
+    padding: 0 40px 0 20px;
     min-height: 300px;
 }
 
@@ -116,7 +116,7 @@ body
 .column.short
 {
     float: right;
-    width: 280px;
+    width: 240px;
 }
 
 .clear + .column
