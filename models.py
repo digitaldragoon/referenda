@@ -1,9 +1,36 @@
 from datetime import datetime, timedelta
 from django.db import models
+from django.contrib.auth.models import User
 
 ################################################################################
 # FIELDS
 ################################################################################
+
+class CommaSeparatedListField(models.TextField):
+    """
+    Field which transparently translates between database comma-separated strings and lists of strings.
+    """
+    __metaclass__ = models.SubfieldBase
+
+    def to_python(self, value):
+        if isinstance(value, list):
+            return value
+
+        elif isinstance(value, unicode) or isinstance(value, str):
+            return value.split(',')
+
+        else:
+            raise TypeError, 'cannot translate value of type "%s" into value of type "list"' % value.__class__.__name__
+
+    def get_db_prep_value(self, value):
+        if value == None:
+            return ''
+        
+        elif isinstance(value, list):
+            return ','.join(list)
+
+        else:
+            raise TypeError, 'value is not of type "list"'
 
 class BallotField(models.TextField):
     """
@@ -62,6 +89,7 @@ class Poll (models.Model):
     active = models.BooleanField(help_text="Should this poll open? (disable to make changes before re-opening poll)", default=True)
     inactive_notice = models.TextField(help_text="Message to display when the polls have opened but the poll has been marked as inactive. Use this to announce period of maintenance or repair.", blank=True)
     ballot = BallotField(blank=True)
+    administrator = models.ForeignKey(User)
 
     objects = PollManager()
 
@@ -177,7 +205,7 @@ class Election (Poll):
                 is_signed = authority.has_valid_signature and is_signed
 
             return is_signed
-    signed = property(_check_approval)
+    signed = property(_check_signatures)
 
     def _check_validity(self):
         """
@@ -191,9 +219,9 @@ class ElectionAuthority (models.Model):
     """
     An administrator who acts as a validator and tabulator of an Election, but cannot set the parameters of an Election.
     """
-    user_id = models.CharField(max_length=100)
-    public_key = models.TextField(blank=True)
+    user = models.ForeignKey(User)
     election = models.ForeignKey(Election, related_name="authorities")
+    public_key = models.TextField(blank=True)
     election_signature = models.TextField(blank=True)
     ballot_signature = models.TextField(blank=True)
     approved = models.BooleanField(default=False)
@@ -207,12 +235,12 @@ class ElectionAuthority (models.Model):
     has_valid_signature = property(_verify_signature)
 
     def __unicode__(self):
-        return '%s [%s]' % (self.user_id, self.election)
+        return '%s %s [%s]' % (self.user.first_name, self.user.last_name, self.election)
 
     class Meta:
         verbose_name = "Election Authority"
         verbose_name_plural = "Election Authorities"
-        ordering = ['user_id',]
+        ordering = ['user']
 
 class Race (models.Model):
     """
@@ -221,6 +249,8 @@ class Race (models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField()
     election = models.ForeignKey(Election, related_name="races")
+    rank = models.PositiveIntegerField()
+    groups = CommaSeparatedListField()
 
     def __unicode__(self):
         return "%s [%s]" % (self.name, self.election)

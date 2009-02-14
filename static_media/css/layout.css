@@ -14,6 +14,12 @@ body
     padding: 0;
 }
 
+#js-warning
+{
+    padding: 4px;
+    margin: 8px 15px;
+}
+
 #frame
 {
     position: relative;
@@ -141,6 +147,11 @@ ul.horizontal li
 ul.small li
 {
     font-size: 12px;
+}
+
+dt
+{
+    margin: 8px 0 2px 0;
 }
 
 .column.long

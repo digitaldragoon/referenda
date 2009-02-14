@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Referenda - {% if page_title %}{{ page_title }}{% else %}UNTITLED{% endif %}</title>
+    <title>Referenda - {% block title %}{% if page_title %}{{ page_title }}{% else %}UNTITLED{% endif %}{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="{{ REFERENDA_MEDIA_PREFIX }}/css/screen.css" />
     <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{{REFERENDA_MEDIA_PREFIX }}/css/ie7.css" /><![endif]-->
     <!--[if lte IE 6]><link rel="stylesheet" type="text/css" href="{{ REFERENDA_MEDIA_PREFIX }}/css/ie6.css" /><![endif]-->
@@ -16,7 +16,10 @@
 <body>
     <div id="frame">
         <div id="header">
-            <a id="logo" href="{% url referenda.home %}"><img alt="Referenda - Power to the people." src="{{ REFERENDA_MEDIA_PREFIX }}/img/logo.png" width="330" height="64" /></a>
+            <a id="logo" href="{% url referenda.home %}"><img alt="Referenda - Power to the people." src="{{ REFERENDA_MEDIA_PREFIX }}/img/logo.png" /></a>
+        </div>
+        <div id="js-warning">
+            <p>WARNING: Referenda has detected that you have JavaScript disabled. You will not be able to vote unless you re-enable it.</p>
         </div>
         <div id="content-pane">
             <div id="inner-frame">
@@ -33,7 +36,7 @@
             <ul class="horizontal">
                 <li><a href="#">About Referenda</a> |</li>
                 <li><a href="#">Audit source code</a> |</li>
-                <li><a href="#">Administrator login</a> |</li>
+                <li><a href="/admin/">Administrator login</a> |</li>
                 <li><a href="#">Contact administrator</a></li>
             </ul>
             <p>Referenda is licensed under the <a rel="external" href="{% url referenda.license %}">GNU General Public Licence v3</a>.</p>

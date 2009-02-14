@@ -15,15 +15,15 @@ label,
 h1
 {
     width: 100%;
-    border-bottom: 1px solid;
+    border-bottom: 1px #888888 solid;
     font-size: 24px;
     margin-bottom: 8px;
 }
 
 h2
 {
-    width: 80%;
-    border-bottom: 1px solid;
+    width: 90%;
+    border-bottom: 1px #888888 solid;
     font-size: 18px;
     margin-bottom: 8px;
 }
@@ -56,12 +56,29 @@ button
 dt
 {
     font-weight: bold;
+    font-size: 14px;
+}
+dt .link
+{
+    font-size: 9px;
+    vertical-align: middle;
+    padding-bottom: 4px;
+}
+dd
+{
+    font-size: 12px;
+}
+
+.important
+{
+    font-weight: bold;
 }
 
 #footer,
 #footer p
 {
     font-size: 10px;
+    margin-bottom: 0;
 }
 #footer a
 {

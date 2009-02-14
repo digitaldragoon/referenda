@@ -7,6 +7,12 @@ html
     background: #410000 url("../img/bkgd.png") top left repeat-x;
 }
 
+#js-warning
+{
+    border: 2px #ff0000 solid;
+    background: #ffe0e0;
+}
+
 #frame
 {
     background: #e9e9e9 url('../img/frame_bkgd.png') top left repeat-x;
@@ -104,14 +110,14 @@ li.election
 }
 li.election.hover
 {
-    background-color: #f4f4ff;
+    background-color: #eeeeff;
     background-position: 7px 14px;
     border: 1px #1a1a1a dotted;
     cursor: pointer;
 }
 li.election.invalid.hover
 {
-    background-color: #fff4f4;
+    background-color: #ffeeee;
 }
 li.election.small
 {
@@ -121,7 +127,7 @@ li.election.small.hover
 {
     background-position: 4px 7px;
 }
-li.election.invalid a
+li.election.invalid a.title-link
 {
     color: #ca5661;
 }

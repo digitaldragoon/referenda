@@ -13,3 +13,8 @@
     height: 300px;
 }
 
+li.election.hover
+{
+    padding: 7px 7px 7px 24px;
+}
+
