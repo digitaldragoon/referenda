@@ -52,13 +52,18 @@ button
     font-weight: bold;
     text-decoration: none;
 }
-a:hover,
-a:active
-{
-    text-decoration: underline;
-}
 
 dt
 {
     font-weight: bold;
+}
+
+#footer,
+#footer p
+{
+    font-size: 10px;
+}
+#footer a
+{
+    font-weight: normal;
 }

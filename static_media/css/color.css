@@ -4,13 +4,12 @@
 
 html
 {
-    background: #5a0000;
-    background: #5e5e5e url("../img/bkgd.png") top left repeat-x;
+    background: #410000 url("../img/bkgd.png") top left repeat-x;
 }
 
 #frame
 {
-    background-color: #ffffff;
+    background: #e9e9e9 url('../img/frame_bkgd.png') top left repeat-x;
 }
 #frame div.bkgd
 {
@@ -30,9 +29,9 @@ html
     background: transparent url("../img/header.png") top left no-repeat;
 }
 
-#content-pane
+#footer
 {
-    background-color: #fff;
+    background: transparent url("../img/footer.png") top left repeat-x;
 }
 
 #inner-frame
@@ -61,21 +60,32 @@ html
  * ELEMENTS
  *----------------------------------------------------------------------------*/
 
-ul
+h1, h2, h3, h4, h5, a
 {
-    list-style: none;
+    color: #1a1a1a;
 }
 
-li.election
+#footer
 {
-    background: url("../img/list_bullet.png") no-repeat 5px 15px;
+    color: #e9e9e9;
 }
-li.election.hover
+
+a
 {
-    background-color: #eeeeee;
-    background-position: 4px 14px;
-    border: 1px #1a1a1a dotted;
-    cursor: pointer;
+    color: #6156ca;
+}
+a:hover
+{
+    color: #1a1a1a;
+}
+#footer a:hover
+{
+    color: #e9e9e9;
+}
+
+.grey
+{
+    color: #888888;
 }
 
 a img
@@ -83,12 +93,39 @@ a img
     border: none;
 }
 
-a
+ul
 {
-    color: #6156ca;
+    list-style: none;
 }
 
-.grey
+li.election
 {
-    color: #888888;
+    background: url("../img/list_bullet.png") no-repeat 8px 15px;
+}
+li.election.hover
+{
+    background-color: #f4f4ff;
+    background-position: 7px 14px;
+    border: 1px #1a1a1a dotted;
+    cursor: pointer;
+}
+li.election.invalid.hover
+{
+    background-color: #fff4f4;
+}
+li.election.small
+{
+    background-position: 5px 8px;
+}
+li.election.small.hover
+{
+    background-position: 4px 7px;
+}
+li.election.invalid a
+{
+    color: #ca5661;
+}
+li.election.invalid a:hover
+{
+    color: #1a1a1a;
 }

@@ -40,9 +40,8 @@ body
 #content-pane
 {
     position: relative;
-    width: 100%;
     z-index: 1;
-    padding-bottom: 50px;
+    padding-bottom: 65px;
 }
 
 #header
@@ -53,18 +52,27 @@ body
     z-index: 30;
 }
 
+#footer
+{
+    position: absolute;
+    bottom: 0;
+    height: 35px;
+    width: 870px;
+    padding: 15px 15px;
+}
+
 #logo
 {
     position: absolute;
-    top: 30px;
+    top: 39px;
     left: 15px;
 }
 
 #inner-frame
 {
     position: relative;
-    width: 876px;
-    margin: 20px 11px;
+    width: 886px;
+    margin: 20px 14px 20px 0;
     overflow: hidden;
 }
 
@@ -91,14 +99,14 @@ body
     margin-bottom: -10000px;
 }
 
+/*------------------------------------------------------------------------------
+ * ELEMENTS
+ *----------------------------------------------------------------------------*/
+
 .clear
 {
     clear: both;
 }
-
-/*------------------------------------------------------------------------------
- * ELEMENTS
- *----------------------------------------------------------------------------*/
 
 #advanced-panel .button
 {
@@ -115,6 +123,24 @@ li.election.hover
 {
     border: 1px #1a1a1a dashed;
     padding: 7px 7px 7px 24px;
+}
+li.election.small
+{
+    padding: 2px 2px 2px 25px;
+}
+li.election.small.hover
+{
+    padding: 1px 1px 1px 24px;
+}
+
+ul.horizontal li
+{
+    display: inline;
+}
+
+ul.small li
+{
+    font-size: 12px;
 }
 
 .column.long

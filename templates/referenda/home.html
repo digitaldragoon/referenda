@@ -3,18 +3,40 @@
 {% block main %}
 <div class="column long">
     <h1>Welcome</h1>
-    <p>Welcome to Referenda, the open-source, open-audit voting system (<a href="/about/">what does that mean?</a>). Referenda puts the power back in your hands. Look below to find an election to vote in.</p>
+    <p>Welcome to Referenda, the open-source, open-audit voting system (<a href="#">what does that mean?</a>). Referenda puts the power back in your hands. Look below to find an election to vote in.</p>
     <h2>Current Elections</h2>
+    {% if current_elections %}
     <ul>
-        <li class="election">
-        <h3><a href="#">ASUPS Spring Elections (2009)</a> <span class="annotation grey">polls close in 12h 42m</span></h3>
-        <p>Polls are open! Click here to vote.</p>
-        </li>
+        {% for election in current_elections %}
+        {% include "referenda/elements/election.html" %}
+        {% endfor %}
     </ul>
+    {% else %}
+    <p>There are no current elections.</p>
+    {% endif %}
     <h2>Upcoming Elections</h2>
+    {% if upcoming_elections %}
+    <ul>
+        {% for election in upcoming_elections %}
+        {% include "referenda/elements/election.html" %}
+        {% endfor %}
+    </ul>
+    {% else %}
     <p>There are no upcoming elections.</p>
+    {% endif %}
 </div>
 <div class="column short">
     <h1>Past Elections</h1>
+    {% if past_elections %}
+    <ul>
+        {% for election in past_elections %}
+        <li class="election small">
+        <a class="title-link" href="#">{{ election.name }}</a> <span class="annotation grey">{{ election.poll_opens.date }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no past elections.</p>
+    {% endif %}
 </div>
 {% endblock %}

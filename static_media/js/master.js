@@ -1,3 +1,4 @@
+/* "Big target" makes gives us nice big clickable blocks of content */
 $(document).ready(function() {
-        $('li.election h3 a').bigTarget();
+        $('li.election a.title-link').bigTarget();
 });

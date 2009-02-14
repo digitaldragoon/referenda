@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db import models
 
 ################################################################################
@@ -35,17 +35,35 @@ class BallotField(models.TextField):
 # MODELS
 ################################################################################
 
+class PollManager (models.Manager):
+    def active(self):
+        return self.filter(active=True)
+
+    def current(self):
+        now = datetime.now()
+        return self.active().filter(poll_opens__lte=now, poll_closes__gte=now)
+
+    def upcoming(self):
+        now = datetime.now()
+        return self.active().filter(poll_opens__gte=now)
+
+    def past(self):
+        now = datetime.now()
+        return self.active().filter(poll_closes__lte=now)
+
 class Poll (models.Model):
     """
     The superclass for all types of polls.
     """
     name = models.CharField(max_length=250, unique=True)
     slug = models.SlugField()
-    poll_opens = models.DateTimeField(default=datetime.now())
-    poll_closes = models.DateTimeField(default=datetime.now())
+    poll_opens = models.DateTimeField(default=datetime.now()+timedelta(days=7))
+    poll_closes = models.DateTimeField(default=datetime.now()+timedelta(days=14))
     active = models.BooleanField(help_text="Should this poll open? (disable to make changes before re-opening poll)", default=True)
     inactive_notice = models.TextField(help_text="Message to display when the polls have opened but the poll has been marked as inactive. Use this to announce period of maintenance or repair.", blank=True)
     ballot = BallotField(blank=True)
+
+    objects = PollManager()
 
     _child_type = models.CharField(max_length=30, editable=False)
     def _get_child(self):
@@ -67,6 +85,47 @@ class Poll (models.Model):
         """
         raise NotImplementedError, "subclasses must implement generate_ballot()"
 
+    def _get_days_delta (self, then):
+        delta = then - datetime.now()
+        return delta.days
+
+    def _get_hours_delta (self, then):
+        delta = then - datetime.now()
+        return (delta.seconds % 86400) / 3600
+
+    def _get_minutes_delta (self, then):
+        delta = then - datetime.now()
+        return (delta.seconds % 3600) / 60
+
+    def _get_days_remaining(self):
+        return self._get_days_delta(self.poll_closes)
+    days_remaining = property(_get_days_remaining)
+
+    def _get_hours_remaining (self):
+        return self._get_hours_delta(self.poll_closes)
+    hours_remaining = property(_get_hours_remaining)
+
+    def _get_minutes_remaining (self):
+        return self._get_hours_delta(self.poll_closes)
+    minutes_remaining = property(_get_minutes_remaining)
+
+    def _get_days_until(self):
+        return self._get_days_delta(self.poll_opens)
+    days_until = property(_get_days_until)
+
+    def _get_hours_until (self):
+        return self._get_hours_delta(self.poll_opens)
+    hours_until = property(_get_hours_until)
+
+    def _get_minutes_until (self):
+        return self._get_minutes_delta(self.poll_opens)
+    minutes_until = property(_get_minutes_until)
+
+    def _get_poll_currently_open (self):
+        now = datetime.now()
+        return now < self.poll_closes and now > self.poll_opens
+    poll_currently_open = property(_get_poll_currently_open)
+
     def save(self):
         self._child_type = self.__class__.__name__
         super(Poll, self).save()
@@ -78,6 +137,7 @@ class Election (Poll):
     """
     Election with heavy encryption and all sorts of other security features.
     """
+    objects = PollManager()
 
     def _compute_hash(self):
         """

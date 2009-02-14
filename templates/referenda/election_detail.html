@@ -1,0 +1,15 @@
+{% extends "referenda/base.html" %}
+
+{% block main %}
+<div class="column long">
+    <h1>{{ object.name }}</h1>
+</div>
+<div class="column short">
+    <h1>Administrators</h1>
+    <ul class="small">
+        <li><a href="#">Administrator login</a></li>
+        <li><a href="#">Election authority login</a></li>
+    </ul>
+</div>
+
+{% endblock %}
