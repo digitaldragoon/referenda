@@ -1,0 +1,17 @@
+{% extends "referenda/base.html" %}
+
+{% block title %}Login to vote!{% endblock %}
+
+{% block main %}
+<h1>{{ election.name }}</h1>
+<div class="center">
+    <h3>Login to vote.</h3>
+    <p>{{ election.authenticator.message }}</p>
+    <form>
+        <div>
+            <input type="text" />
+            <input type="password" />
+        </div>
+    </form>
+</div>
+{% endblock %}

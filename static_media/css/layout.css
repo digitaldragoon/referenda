@@ -166,6 +166,14 @@ dt
     width: 240px;
 }
 
+div.center
+{
+    width: 300px;
+    margin: 60px auto;
+    padding: 30px 20px;
+    text-align: center;
+}
+
 .clear + .column
 {
     margin-top: 20px;

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
+from referenda import utils
 
 ################################################################################
 # FIELDS
@@ -165,7 +166,22 @@ class Election (Poll):
     """
     Election with heavy encryption and all sorts of other security features.
     """
+    authentication = models.CharField(max_length=200, choices=utils.get_auth_choices())
     objects = PollManager()
+
+    def _get_authenticator(self):
+        if hasattr(self, '_authenticator'):
+            return self._authenticator
+        else:
+            modname = self.authentication.rsplit('.', 1)[0]
+            classname = self.authentication.rsplit('.', 1)[1]
+
+            mod = __import__(modname, {}, {}, [''])
+            self._authenticator = getattr(mod, classname)()
+
+            return self._authenticator
+
+    authenticator = property(_get_authenticator)
 
     def _compute_hash(self):
         """
@@ -241,6 +257,7 @@ class ElectionAuthority (models.Model):
         verbose_name = "Election Authority"
         verbose_name_plural = "Election Authorities"
         ordering = ['user']
+        unique_together = ('user', 'election')
 
 class Race (models.Model):
     """
@@ -343,6 +360,9 @@ class SealedVote (models.Model):
     poll = models.ForeignKey(Poll)
     ballot = BallotField()
     signature = models.TextField()
+
+    class Meta:
+        unique_together = ('user_id', 'poll')
     
 class Ballot (unicode):
     """

@@ -66,6 +66,12 @@ html
  * ELEMENTS
  *----------------------------------------------------------------------------*/
 
+div.center
+{
+    border: 1px #888888 dotted;
+    background-color: #eeeeff;
+}   
+
 h1, h2, h3, h4, h5, a
 {
     color: #1a1a1a;
