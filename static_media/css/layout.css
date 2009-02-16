@@ -65,6 +65,7 @@ body
     height: 35px;
     width: 870px;
     padding: 15px 15px;
+    z-index: 50;
 }
 
 #logo
@@ -114,11 +115,11 @@ body
     clear: both;
 }
 
-#advanced-panel .button
+ol
 {
-    position: absolute;
-    top: 0;
-    left: -54px;
+    margin: 20px 0;
+    padding-left: 40px;
+    font-size: 12px;
 }
 
 li.election
@@ -143,10 +144,25 @@ ul.horizontal li
 {
     display: inline;
 }
-
 ul.small li
 {
     font-size: 12px;
+}
+ul.form li
+{
+    margin: 5px 0;
+}
+
+li.progress-item
+{
+    padding-left: 25px;
+}
+
+input[type="text"],
+input[type="password"]
+{
+    font-size: 12px;
+    padding: 2px;
 }
 
 dt

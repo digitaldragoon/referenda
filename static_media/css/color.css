@@ -71,6 +71,10 @@ div.center
     border: 1px #888888 dotted;
     background-color: #eeeeff;
 }   
+div.center.invalid
+{
+    background-color: #ffeeee;
+}   
 
 h1, h2, h3, h4, h5, a
 {
@@ -95,7 +99,8 @@ a:hover
     color: #e9e9e9;
 }
 
-.grey
+.grey,
+.watermark
 {
     color: #888888;
 }
@@ -140,4 +145,17 @@ li.election.invalid a.title-link
 li.election.invalid a:hover
 {
     color: #1a1a1a;
+}
+
+li.progress-item a
+{
+    cursor: pointer;
+}
+li.progress-item.in-progress
+{
+    background: transparent url("../img/checkbox_off.png") 3px 5px no-repeat;
+}
+li.progress-item.completed
+{
+    background: transparent url("../img/checkbox_on.png") 3px 5px no-repeat;
 }

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
+from django.template.loader import render_to_string
 from referenda import utils
 
 ################################################################################
@@ -11,27 +12,28 @@ class CommaSeparatedListField(models.TextField):
     """
     Field which transparently translates between database comma-separated strings and lists of strings.
     """
+    # Django likes to call to_python twice for some reason, so we hack this
+    # magic string when we're on our way to the database rather than
+    # to python
+    MAGIC_STRING = u'\b\u0223\u0195'
     __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
-        if isinstance(value, list):
+        if isinstance(value, (str, unicode)):
+            if value.startswith(self.MAGIC_STRING):
+                return value.lstrip(self.MAGIC_STRING)
+            else:
+                return value.split(',')
+
+        elif isinstance(value, (list, tuple)):
             return value
 
-        elif isinstance(value, unicode) or isinstance(value, str):
-            return value.split(',')
-
-        else:
-            raise TypeError, 'cannot translate value of type "%s" into value of type "list"' % value.__class__.__name__
-
     def get_db_prep_value(self, value):
-        if value == None:
-            return ''
-        
-        elif isinstance(value, list):
-            return ','.join(list)
+        if isinstance(value, (str, unicode)):
+            return value
 
-        else:
-            raise TypeError, 'value is not of type "list"'
+        elif isinstance(value, (list, tuple)):
+            return self.MAGIC_STRING + u','.join(value)
 
 class BallotField(models.TextField):
     """
@@ -84,7 +86,7 @@ class Poll (models.Model):
     The superclass for all types of polls.
     """
     name = models.CharField(max_length=250, unique=True)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
     poll_opens = models.DateTimeField(default=datetime.now()+timedelta(days=7))
     poll_closes = models.DateTimeField(default=datetime.now()+timedelta(days=14))
     active = models.BooleanField(help_text="Should this poll open? (disable to make changes before re-opening poll)", default=True)
@@ -209,7 +211,10 @@ class Election (Poll):
         """
         Check whether all election authorities have signed the empty ballot.
         """
-        if self.empty_ballot == "":
+        #FIXME
+        return True
+
+        if self.ballot == "":
             # if we have no ballot, it cannot be signed
             return False
 
@@ -230,6 +235,28 @@ class Election (Poll):
         return self.approved and self.signed
     valid = property(_check_validity)
 
+    def render_frame (self):
+        return render_to_string('referenda/components/frame.html', {'election': self})
+
+    def get_races_for (self, groups):
+        """
+        Given a list of groups, returns a dictionary mapping slugs to names of races which have any one of those groups in their 'groups' field, or which have no groups in thier 'groups' field.
+        """
+        final_races = {}
+        for race in self.races.all():
+            valid_race = False
+            if len(race.groups) == 0:
+                valid_race = True
+            else:
+                for group in groups:
+                    if race.groups.count(group) > 0:
+                        valid_race = True
+                        break
+
+            if valid_race:
+                final_races[race.slug] = race.name
+
+        return final_races
 
 class ElectionAuthority (models.Model):
     """
@@ -247,7 +274,7 @@ class ElectionAuthority (models.Model):
         Verifies this ElectionAuthority's ballot and election signatures against the hashes of the Ballot and Election.
         """
         #FIXME
-        raise NotImplementedError, "not yet implemented"
+        return True
     has_valid_signature = property(_verify_signature)
 
     def __unicode__(self):
@@ -267,13 +294,20 @@ class Race (models.Model):
     slug = models.SlugField()
     election = models.ForeignKey(Election, related_name="races")
     rank = models.PositiveIntegerField()
-    groups = CommaSeparatedListField()
+    groups = CommaSeparatedListField(blank=True)
 
     def __unicode__(self):
         return "%s [%s]" % (self.name, self.election)
 
+    def render(self):
+        """
+        Renders this Race for the voting JavaScript to pull in (bypasses forms).
+        """
+        return render_to_string('referenda/components/race.html', {'race': self})
+
     class Meta:
         ordering = ['election', 'name']
+        unique_together = ('slug', 'election',)
 
 class Referendum (models.Model):
     """
@@ -331,6 +365,9 @@ class BallotCandidate (Candidate):
     def __unicode__(self):
         return self.full_name
 
+    def render (self):
+        return render_to_string('referenda/ballotcandidate.html', {'candidate': self})
+
     class Meta:
         verbose_name = 'Ballot Candidate'
         ordering = ['race', 'last_name', 'first_name']
@@ -347,6 +384,9 @@ class WriteInCandidate (Candidate):
 
     def __unicode__(self):
         return self.full_name
+
+    def render (self):
+        return render_to_string('referenda/writeincandidate.html', {'candidate': self})
 
     class Meta:
         verbose_name = 'Write-in Candidate'

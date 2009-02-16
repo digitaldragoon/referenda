@@ -1,3 +1,4 @@
+from referenda.auth.standard import BaseAuth
 import os
 import inspect
 
@@ -24,7 +25,7 @@ def get_authenticators():
         else:
             for name in dir(mod):
                 item = getattr(mod, name)
-                if inspect.isclass(item):
+                if inspect.isclass(item) and issubclass(item, BaseAuth):
                     authenticators.append('referenda.auth.%s.%s' % (module_name, name))
 
     return authenticators

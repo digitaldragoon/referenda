@@ -2,16 +2,37 @@
 
 {% block title %}Login to vote!{% endblock %}
 
+{% block script %}
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/jquery.watermark.js"></script>
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/libvote.js"></script>
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/vote.js"></script>
+<script type="text/javascript">
+    function submit_on_enter(e) {
+        if (e.which == 13) {
+            $('#login_submit').click();
+        }
+    }
+    $(document).ready(function() {
+                $("#login_frame").show();
+                $("#login_user_id").keypress(submit_on_enter).watermark("username");
+                $("#login_password").keypress(submit_on_enter).watermark("password");
+            });
+</script>
+{% endblock %}
+
 {% block main %}
 <h1>{{ election.name }}</h1>
-<div class="center">
+<noscript><div class="center invalid">
+    <h3>Javascript disabled.</h3>
+    <p>Please enable JavaScript to continue voting.</p>
+</div></noscript>
+<div id="login_frame" class="center" style="display: none;">
     <h3>Login to vote.</h3>
     <p>{{ election.authenticator.message }}</p>
-    <form>
-        <div>
-            <input type="text" />
-            <input type="password" />
-        </div>
-    </form>
+    <ul class="form">
+        <li><input title="Username" id="login_user_id" type="text" /></li>
+        <li><input title="Password" id="login_password" type="password" /></li>
+        <li><a id="login_submit" class="button login">Login</a></li>
+    </ul>
 </div>
 {% endblock %}

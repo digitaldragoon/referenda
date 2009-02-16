@@ -1,0 +1,48 @@
+a.button
+{
+    display: inline-block;
+    overflow: hidden;
+    padding-top: 36px;
+    width: 94px;
+    height: 0;
+    background-repeat: none;
+    background-position: 0px 0px;
+    cursor: pointer;
+}
+a.button:hover
+{
+    background-position: 0 36px;
+}
+
+a.button.advanced
+{
+    padding-top: 99px;
+    width: 54px;
+    background-image: url("../img/controlpanel_button.png");
+}
+a.button.advanced:hover
+{
+    background-position: 0px 0px;
+}
+a.button.votenow
+{
+    background-image: url("../img/button_votenow.png");
+}
+a.button.login
+{
+    background-image: url("../img/button_login.png");
+}
+
+#advanced-panel a.button
+{
+    position: absolute;
+    top: 0;
+    left: -54px;
+}
+
+p.wait
+{
+    padding-left: 22px;
+    line-height: 16px;
+    background: transparent url("../img/wait16.gif") 0px 0px no-repeat;
+}

@@ -18,3 +18,13 @@ li.election.hover
     padding: 7px 7px 7px 24px;
 }
 
+#js-warning
+{
+    position: relative;
+    z-index: 500;
+}
+
+.button.advanced
+{
+    background-image: url("../img/controlpanel_button_ie6.png");
+}

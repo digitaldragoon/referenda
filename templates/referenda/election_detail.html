@@ -7,6 +7,7 @@
     <h1>{{ object.name }}</h1>
     <p>Polls open <strong>{{ object.poll_opens|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_opens|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.
     <p>Polls close <strong>{{ object.poll_closes|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_closes|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>
+    {% if object.valid %}<a class="button votenow" href="{% url referenda.voter_login object.slug %}">Vote Now!</a>{% endif %}
 </div>
 <div class="column short">
     <h1>Administrators</h1>

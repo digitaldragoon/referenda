@@ -1,0 +1,7 @@
+<h2>{{ race.name }}</h2>
+<p>This is a race!</p>
+<div>
+    {% for candidate in race.candidates.all %}
+    {{ candidate.child.render }}
+    {% endfor %}
+</div>
