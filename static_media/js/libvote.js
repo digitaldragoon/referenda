@@ -54,9 +54,11 @@ VoteControl.prototype.activate_controls = function() {
     $('#progress-frame li a').click(function() {
                 var id = $(this).closest('li').attr('id').split('_')[1];
                 var current = $('#progress-frame').data('current');
-                $('#panel_' + current).toggle();
-                $('#panel_' + id).toggle();
-                $('#progress-frame').data('current', id);
+                if (id != current) {
+                    $('#panel_' + current).toggle();
+                    $('#panel_' + id).toggle();
+                    $('#progress-frame').data('current', id);
+                }
             });
     $('#progress_setup').removeClass('in-progress').addClass('completed');
 
