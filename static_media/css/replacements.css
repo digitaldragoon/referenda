@@ -5,7 +5,7 @@ a.button
     padding-top: 36px;
     width: 94px;
     height: 0;
-    background-repeat: none;
+    background-repeat: repeat-y;
     background-position: 0px 0px;
     cursor: pointer;
 }
@@ -45,4 +45,38 @@ p.wait
     padding-left: 22px;
     line-height: 16px;
     background: transparent url("../img/wait16.gif") 0px 0px no-repeat;
+}
+
+#progress-frame li
+{
+    font-weight: bold;
+    padding-left: 25px;
+    font-size: 14px;
+    background-position: 5px 4px;
+    background-repeat: no-repeat;
+}
+#progress-frame li a
+{
+    cursor: pointer;
+}
+#progress-frame li.in-progress
+{
+    background-image: url("../img/checkbox_off.png");
+}
+#progress-frame li.completed
+{
+    background-image: url("../img/checkbox_on.png");
+}
+
+li.candidate div.checkbox
+{
+
+    float: left;
+    background: transparent url("../img/checkbox_off.png") 0px 34px no-repeat;
+    height: 80px;
+    width: 12px;
+}
+li.candidate.selected div.checkbox
+{
+    background-image: url("../img/checkbox_on.png");
 }

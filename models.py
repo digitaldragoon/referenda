@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
+from django.template import RequestContext
 from referenda import utils
 
 ################################################################################
@@ -235,14 +236,11 @@ class Election (Poll):
         return self.approved and self.signed
     valid = property(_check_validity)
 
-    def render_frame (self):
-        return render_to_string('referenda/components/frame.html', {'election': self})
-
     def get_races_for (self, groups):
         """
-        Given a list of groups, returns a dictionary mapping slugs to names of races which have any one of those groups in their 'groups' field, or which have no groups in thier 'groups' field.
+        Given a list of groups, returns a list of races which have any one of those groups in their 'groups' field, or which have no groups in thier 'groups' field.
         """
-        final_races = {}
+        final_races = []
         for race in self.races.all():
             valid_race = False
             if len(race.groups) == 0:
@@ -254,7 +252,7 @@ class Election (Poll):
                         break
 
             if valid_race:
-                final_races[race.slug] = race.name
+                final_races.append(race.slug)
 
         return final_races
 
@@ -286,6 +284,12 @@ class ElectionAuthority (models.Model):
         ordering = ['user']
         unique_together = ('user', 'election')
 
+class RaceManager (models.Manager):
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return super(RaceManager, self).get_query_set().order_by('rank')
+
 class Race (models.Model):
     """
     A race for an individual position, such as a senate seat or board chairmanship.
@@ -296,14 +300,10 @@ class Race (models.Model):
     rank = models.PositiveIntegerField()
     groups = CommaSeparatedListField(blank=True)
 
-    def __unicode__(self):
-        return "%s [%s]" % (self.name, self.election)
+    objects = RaceManager()
 
-    def render(self):
-        """
-        Renders this Race for the voting JavaScript to pull in (bypasses forms).
-        """
-        return render_to_string('referenda/components/race.html', {'race': self})
+    def __unicode__(self):
+        return "%s [%d, %s]" % (self.name, self.rank, self.election)
 
     class Meta:
         ordering = ['election', 'name']
@@ -328,6 +328,8 @@ class Candidate (models.Model):
     The superclass for candidates in Races.
     """
     race = models.ForeignKey(Race, related_name="candidates")
+
+    template = 'referenda/ballotcandidate.html'
 
     _child_type = models.CharField(max_length=30, editable=False)
     def _get_child(self):
@@ -365,9 +367,6 @@ class BallotCandidate (Candidate):
     def __unicode__(self):
         return self.full_name
 
-    def render (self):
-        return render_to_string('referenda/ballotcandidate.html', {'candidate': self})
-
     class Meta:
         verbose_name = 'Ballot Candidate'
         ordering = ['race', 'last_name', 'first_name']
@@ -378,15 +377,14 @@ class WriteInCandidate (Candidate):
     """
     name = models.CharField(max_length=250)
 
+    template = 'referenda/ballotcandidate.html'
+
     def _get_full_name(self):
         return name
     full_name = property(_get_full_name)
 
     def __unicode__(self):
         return self.full_name
-
-    def render (self):
-        return render_to_string('referenda/writeincandidate.html', {'candidate': self})
 
     class Meta:
         verbose_name = 'Write-in Candidate'

@@ -90,7 +90,8 @@ a
 {
     color: #6156ca;
 }
-a:hover
+a:hover,
+.hovered a
 {
     color: #1a1a1a;
 }
@@ -119,14 +120,14 @@ li.election
 {
     background: url("../img/list_bullet.png") no-repeat 8px 15px;
 }
-li.election.hover
+li.election.hovered
 {
     background-color: #eeeeff;
     background-position: 7px 14px;
     border: 1px #1a1a1a dotted;
     cursor: pointer;
 }
-li.election.invalid.hover
+li.election.invalid.hovered
 {
     background-color: #ffeeee;
 }
@@ -134,28 +135,18 @@ li.election.small
 {
     background-position: 5px 8px;
 }
-li.election.small.hover
+li.election.small.hovered
 {
     background-position: 4px 7px;
 }
-li.election.invalid a.title-link
-{
-    color: #ca5661;
-}
-li.election.invalid a:hover
-{
-    color: #1a1a1a;
-}
 
-li.progress-item a
+li.candidate.hovered
 {
+    background-color: #ffeeee;
+    border: 1px #1a1a1a dotted;
     cursor: pointer;
 }
-li.progress-item.in-progress
+li.candidate.selected.hovered
 {
-    background: transparent url("../img/checkbox_off.png") 3px 5px no-repeat;
-}
-li.progress-item.completed
-{
-    background: transparent url("../img/checkbox_on.png") 3px 5px no-repeat;
+    background-color: #eeeeff;
 }

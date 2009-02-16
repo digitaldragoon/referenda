@@ -126,7 +126,7 @@ li.election
 {
     padding: 8px 8px 8px 25px;
 }
-li.election.hover
+li.election.hovered
 {
     border: 1px #1a1a1a dashed;
     padding: 7px 7px 7px 24px;
@@ -135,7 +135,7 @@ li.election.small
 {
     padding: 2px 2px 2px 25px;
 }
-li.election.small.hover
+li.election.small.hovered
 {
     padding: 1px 1px 1px 24px;
 }
@@ -151,11 +151,6 @@ ul.small li
 ul.form li
 {
     margin: 5px 0;
-}
-
-li.progress-item
-{
-    padding-left: 25px;
 }
 
 input[type="text"],
@@ -193,4 +188,23 @@ div.center
 .clear + .column
 {
     margin-top: 20px;
+}
+
+li.candidate
+{
+    margin: 10px;
+    padding: 10px;
+}
+li.candidate.hovered
+{
+    padding: 9px;
+}
+li.candidate div.photo
+{
+    margin: 0 20px;
+    float: left;
+}
+li.candidate div.info
+{
+    float: left;
 }

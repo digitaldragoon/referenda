@@ -4,25 +4,25 @@ from django.http import HttpResponse, HttpResponseNotAllowed, Http404
 from referenda.models import *
 from django.utils import simplejson as json
 
-def vote_frame (request, election_slug):
+def vote_test (request, slug):
     try:
-        election = Election.objects.get(slug=election_slug)
+        election = Election.objects.get(slug=slug)
     except Election.DoesNotExist:
         raise Http404
     else:
-        return HttpResponse(election.render_frame())
+        return render_to_response('referenda/vote_test.html',
+                                  locals(),
+                                  context_instance=RequestContext(request))
 
-def vote_race (request, election_slug, race_slug):
+def vote_content (request, slug):
     try:
-        election = Election.objects.get(slug=election_slug)
-        race = election.races.get(slug=race_slug)
-
+        election = Election.objects.get(slug=slug)
     except Election.DoesNotExist:
         raise Http404
-    except Race.DoesNotExist:
-        raise Http404
-
-    return HttpResponse(race.render())
+    else:
+        return render_to_response('referenda/vote_content.html',
+                                  locals(),
+                                  context_instance=RequestContext(request))
 
 def voter_login (request, slug):
     election = Election.objects.get(slug=slug)

@@ -1,0 +1,46 @@
+<div id="advanced-panel" style="right: -760px">
+    <a class="button advanced">Advanced</a>
+    <h1>Advanced Control Panel</h1>
+    <p>This control panel gives you access to everything that's going on "under the hood" in Referenda. <strong>WARNING: IF YOU DON'T KNOW WHAT YOU'RE DOING, YOU CAN VERY EASILY RUIN YOUR VOTE.</strong></p>
+    <p>If you don't know what ElGamal encryption and public-key cryptography are, you should leave this panel alone.</p>
+</div>
+<div class="cap top"></div>
+<div id="main">
+    <div class="column long">
+        <h1>{{ election.name }}</h1>
+        <div id="panel-frame">
+            <div id="panel_setup">
+                <h2>Setup</h2>
+                <p>You are now in <strong>voting mode</strong>. From now until you submit your final ballot:</p>
+                <ol>
+                    <li><p><strong>DO NOT PRESS THE "BACK" BUTTON OR REFRESH THE PAGE. YOU WILL HAVE TO START OVER</strong>. You have been warned.</p></li>
+                    <li><p>Most links have been disabled to prevent you from accidentally leaving your voting session.</p></li>
+                    <li><p>If you're a security-conscious user, you can take a look at the "advanced" tab on the right.</p></li>
+                </ol>
+                <p>A "continue" button will appear below when everything's ready. Be patient! Cryptography can take a minute or two.</p>
+            </div>
+            {% for race in election.races.all %}
+            <div id="panel_{{ race.slug }}" style="display: none;">
+                {% include "referenda/race.html" %}
+            </div>
+            {% endfor %}
+            <div id="panel_finalize" style="display: none;">
+                <h2>Finalize</h2>
+            </div>
+        </div>
+    </div>
+    <div class="column short">
+        <h1>Progress</h1>
+        <div id="progress-frame">
+            <ul>
+                <li id="progress_setup" class="in-progress">Setup</li>
+                {% for race in election.races.all %}
+                <li id="progress_{{ race.slug }}"><a>{{ race.name }}</a></li>
+                {% endfor %}
+                <li id="progress_finalize">Finalize</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="clear"></div>
+<div class="cap bottom"></div>

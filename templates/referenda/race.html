@@ -1,7 +1,9 @@
 <h2>{{ race.name }}</h2>
 <p>This is a race!</p>
-<div>
+{% if race.candidates.all %}
+<ul>
     {% for candidate in race.candidates.all %}
-    {{ candidate.child.render }}
+    {% include candidate.child.template %}
     {% endfor %}
-</div>
+</ul>
+{% endif %}
