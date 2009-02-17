@@ -1,9 +1,10 @@
 <li class="candidate">
-    <div class="checkbox"><input name="{{ race.slug }}" type="checkbox" style="display: none;" /></div>
+    <div class="checkbox"></div>
     <div class="photo">{% if candidate.photo %}{% else %}<img alt="{{ candidate.child.full_name }}" src="{{ REFERENDA_MEDIA_PREFIX }}/img/nophoto.png" width="60" height="80" />{% endif %}</div>
     <div class="info">
         <h3><a title="Vote for me!">{{ candidate.child.full_name }}</a></h3>
         <p>{{ candidate.child.bio }}</p>
+        <input type="text" style="display: none;" value="{{ candidate.child.full_name }}" />
     </div>
     <div class="clear"></div>
 </li>

@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.core import serializers
 from referenda import utils
 
 ################################################################################
@@ -252,9 +253,9 @@ class Election (Poll):
                         break
 
             if valid_race:
-                final_races.append(race.slug)
+                final_races.append(race.pk)
 
-        return final_races
+        return serializers.serialize('python', self.races.filter(pk__in=final_races), fields=('name', 'slug', 'num_choices'))
 
 class ElectionAuthority (models.Model):
     """
@@ -297,6 +298,7 @@ class Race (models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField()
     election = models.ForeignKey(Election, related_name="races")
+    num_choices = models.PositiveIntegerField(default=1)
     rank = models.PositiveIntegerField()
     groups = CommaSeparatedListField(blank=True)
 
@@ -304,6 +306,9 @@ class Race (models.Model):
 
     def __unicode__(self):
         return "%s [%d, %s]" % (self.name, self.rank, self.election)
+
+    def num_choices_iter(self):
+        return range(self.num_choices)
 
     class Meta:
         ordering = ['election', 'name']

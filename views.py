@@ -40,6 +40,8 @@ def voter_login (request, slug):
                     'races': {},}
         else:
             data = {'success': True,
+                    'friendly_name': credentials.friendly_name,
+                    'user_id': credentials.user_id,
                     'races': election.get_races_for(credentials.groups),}
 
         return HttpResponse(json.dumps(data))

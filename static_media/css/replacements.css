@@ -32,6 +32,10 @@ a.button.login
 {
     background-image: url("../img/button_login.png");
 }
+a.button.continue
+{
+    background-image: url("../img/button_continue.png");
+}
 
 #advanced-panel a.button
 {

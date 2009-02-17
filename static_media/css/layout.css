@@ -208,3 +208,7 @@ li.candidate div.info
 {
     float: left;
 }
+li.candidate input
+{
+    margin: 5px 0;
+}

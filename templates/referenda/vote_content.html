@@ -20,7 +20,7 @@
                 <p>A "continue" button will appear below when everything's ready. Be patient! Cryptography can take a minute or two.</p>
             </div>
             {% for race in election.races.all %}
-            <div id="panel_{{ race.slug }}" style="display: none;">
+            <div id="panel_{{ race.slug }}" class="race" style="display: none;">
                 {% include "referenda/race.html" %}
             </div>
             {% endfor %}

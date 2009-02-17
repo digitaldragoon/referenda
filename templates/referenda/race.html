@@ -1,9 +1,12 @@
-<h2>{{ race.name }}</h2>
-<p>This is a race!</p>
-{% if race.candidates.all %}
+<h2>{{ race.name }} (choose {{ race.num_choices }})</h2>
+<p>Make up to {{ race.num_choices}} choice{{ race.num_choices|pluralize }}.</p>
 <ul>
+    {% if race.candidates.all %}
     {% for candidate in race.candidates.all %}
     {% include candidate.child.template %}
     {% endfor %}
+    {% endif %}
+    {% for num in race.num_choices_iter %}
+    {% include "referenda/writeincandidate.html" %}
+    {% endfor %}
 </ul>
-{% endif %}
