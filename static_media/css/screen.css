@@ -1,7 +1,7 @@
-@import url("/css/layout.css");
+@import url("./layout.css");
 
-@import url("/css/color.css");
+@import url("./color.css");
 
-@import url("/css/type.css");
+@import url("./type.css");
 
-@import url("/css/replacements.css");
+@import url("./replacements.css");
