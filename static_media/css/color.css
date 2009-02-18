@@ -144,9 +144,17 @@ li.candidate.hovered
 {
     background-color: #ffeeee;
     border: 1px #1a1a1a dotted;
-    cursor: pointer;
 }
 li.candidate.selected.hovered
+{
+    background-color: #eeeeff;
+}
+
+.fitted.hovered
+{
+    cursor: pointer;
+}
+li.fitted.hovered
 {
     background-color: #eeeeff;
 }

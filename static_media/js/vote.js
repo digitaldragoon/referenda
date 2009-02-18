@@ -64,10 +64,15 @@ VoteControl.prototype.load_content = function() {
                 $(data).find('#panel_setup h2').after($(document.createElement('p')).text('Welcome, ' + control.session.friendly_name + '!'));
 
                 $('#inner-frame').html(data);
-                control.set_panel_slide();
+                control.activate_panel();
                 control.configure();
 
+                /* Initial update of finalize page */
+                control.update_ballot();
+
             });
+
+
 }
 
 /* Prunes list of races to those received in the login */
@@ -122,7 +127,6 @@ VoteControl.prototype.activate_controls = function() {
     $('#progress_setup').removeClass('in-progress').addClass('completed');
 
     /* candidate selection */
-    $('li.candidate').fitted();
     $('li.candidate').click(function(e) {
                 if (e.target.tagName != 'INPUT') {
                     if ($(this).hasClass('selected') == true) {
@@ -136,49 +140,128 @@ VoteControl.prototype.activate_controls = function() {
 
     $('li.candidate .info input').keyup(function() {
                 if ($(this).closest('li').hasClass('selected')) {
-                    control.compute_ballot();
+                    control.update_ballot();
                 }
             });
+
+    $('li.candidate').add('#progress-frame li').fitted();
 }
 
 /* Select a candidate */
 VoteControl.prototype.select_candidate = function(candidate) {
-    if (this.check_race_is_full($(candidate).closest('div.race')) > 0) {
+    var id = control.get_race_id($(candidate).closest('div.race'));
+    if (this.get_choices_left_for_race($(candidate).closest('div.race')) > 0) {
         if ($(candidate).find('input').val() == '') {
             control.display_message('please write in a name', candidate);
         }
         else {
             $(candidate).addClass('selected');
-            this.compute_ballot();
+            this.update_ballot();
         }
     }
     else {
-        control.display_message('too many choices!', candidate);
+        control.display_message('You may only select ' + this.session.racemap[id].fields.num_choices + ' candidates.', candidate);
     }
 }
 
 /* Deselect a candidate */
 VoteControl.prototype.deselect_candidate = function(candidate) {
     $(candidate).removeClass('selected');
-    this.compute_ballot();
+    this.update_ballot();
 }
 
 /* Check to see if the maximum number of candidates for a race have been selected. Returns the difference between the number of currently selected candidates and the number of possible candidates (positive means there are still choices to make) */
-VoteControl.prototype.check_race_is_full = function(race) {
+VoteControl.prototype.get_choices_left_for_race = function(race) {
+    return this.get_race_num_choices(race) - $(race).find('li.candidate.selected').length;
+}
+
+/* Returns the number of total choices for a race */
+VoteControl.prototype.get_race_num_choices = function(race) {
     var id = control.get_race_id(race);
-    return this.session.racemap[id].fields.num_choices - $(race).find('li.candidate.selected').length;
+    return this.session.racemap[id].fields.num_choices;
+}
+
+/* Update ballot */
+VoteControl.prototype.update_ballot = function() {
+    this.compute_ballot();
+    this.update_nav_links();
+    this.update_finalize();
+
+}
+
+/* Update candidate choices from ballot */
+VoteControl.prototype.update_candidates_from_ballot = function() {
+    /*FIXME - implement*/
+}
+
+/* update finalize page */
+VoteControl.prototype.update_finalize = function() {
+    var control = this;
+
+    var ballot_text = $('#enc_plaintext_ballot').val();
+    var ballot = $.parseJSON(ballot_text, true);
+
+    var ol = document.createElement('ul');
+    for (key in ballot) {
+        var race = control.session.racemap[key];
+        var li = document.createElement('li');
+
+        var candidates = '';
+        for (candidate in ballot[key]) {
+            if (candidates != '') {
+                candidates += ', ';
+            }
+            candidates += ballot[key][candidate];
+        }
+
+        if (candidates == '')
+        {
+            candidates = 'None';
+        }
+
+        $(li).html('<strong>' + race.fields.name + '</strong>: ' + candidates);
+        $(ol).append(li);
+    }
+
+    $('#final_ballot').html(ol);
 }
 
 /* Compute and update the state of the ballot */
 VoteControl.prototype.compute_ballot = function() {
     var control = this;
+    var result = {};
+
+    /* compile individual race ballots */
     $('#panel-frame').children('.race').each(function () {
-                var result = control.compute_single_ballot(this);
-                var diff = control.check_race_is_full(this);
+                var temp = control.compute_single_ballot(this);
+                for (key in temp) {
+                    result[key] = temp[key];
+                }
+            });
+    
+
+    $('#enc_plaintext_ballot').val($.toJSON(result, true));
+}
+
+/* Compute the results of a single ballot race */
+VoteControl.prototype.compute_single_ballot = function (race) {
+    var id = control.get_race_id(race);
+    var result = {};
+    result[id] = new Array();
+    $(race).find('li.candidate.selected').each(function() {
+                result[id].push($(this).find('.info input').val());
+            });
+    return result;
+}
+
+/* Update nav links with completed/noncompleted status*/
+VoteControl.prototype.update_nav_links = function () {
+    $('#panel-frame').children('.race').each( function() {
+                var diff = control.get_choices_left_for_race(this);
                 var id = control.get_race_id(this);
                 var race_control = $('#progress_' + id);
                 if (diff > 0) {
-                    if (diff === control.session.racemap[id].fields.num_choices) {
+                    if (diff == control.get_race_num_choices($('#panel_' + id))) {
                         $(race_control).removeClass('in-progress').removeClass('completed');
                     }
                     else {
@@ -188,43 +271,12 @@ VoteControl.prototype.compute_ballot = function() {
                 else {
                     $(race_control).removeClass('in-progress').addClass('completed');
                 }
-            });
-    
-    /* Check to see if all ballots are finished */
-    var finished = true;
-    $('#panel-frame').children('.race').each(function () {
-                finished = finished && control.check_race_is_full(this) == 0;
-            });
-
-    /* then reveal or hide finalize link */
-    if (finished) {
-        $('#progress_finalize').html('<a>Finalize</a>').find('a').click(function() {
-                    control.navigate_to_panel('finalize');
-                });
-        control.navigate_to_panel('finalize');
-    }
-    else {
-        $('#progress_finalize').html('Finalize');
-    }
+        });
 }
 
-/* Compute the results of a single ballot race */
-VoteControl.prototype.compute_single_ballot = function (race) {
-    var id = control.get_race_id(race);
-    result = '';
-    $(race).find('li.candidate.selected').each(function() {
-                if (result != '') {
-                    result += ',';
-                }
-                result += '"' + $(this).find('.info input').val() + '"';
-            });
-    result = '"' + id + '": [' + result + ']';
-    alert(result);
-    return result;
-}
-
-/* Set the advanced control panel to slide */
-VoteControl.prototype.set_panel_slide = function() {
+/* Set up the advanced control panel */
+VoteControl.prototype.activate_panel = function() {
+        var control = this;
         var panel = $('#advanced-panel');
         panel.data('state', 'closed');
 
@@ -233,8 +285,8 @@ VoteControl.prototype.set_panel_slide = function() {
             $('#advanced-panel').css('right', '-800px');
         }
 
+        /* Set slider */
         panel.find('.button').click(function() {
-            var panel = $(this).closest('#advanced-panel');
             if (panel.data('state') == 'closed')
             {
                 if (jQuery.browser.msie) { var rightVal = '760px'; }
@@ -256,6 +308,11 @@ VoteControl.prototype.set_panel_slide = function() {
                 panel.data('state', 'closed');
             }
         });
+
+        /* Trigger an update of the finalize page */
+        $('#enc_plaintext_ballot').blur(function() {
+                    control.update_finalize()
+                }); 
 };
 
 /* Get the id of the enclosing rance */

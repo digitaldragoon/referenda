@@ -4,7 +4,7 @@
     <div class="info">
         <h3><a title="Vote for me!">{{ candidate.child.full_name }}</a></h3>
         <p>{{ candidate.child.bio }}</p>
-        <input type="text" style="display: none;" value="{{ candidate.child.full_name }}" />
+        <input name="{{ race.slug }}" type="text" style="display: none;" value="{{ candidate.child.full_name }}" />
     </div>
     <div class="clear"></div>
 </li>

@@ -144,14 +144,11 @@ ul.horizontal li
 {
     display: inline;
 }
-ul.small li
-{
-    font-size: 12px;
-}
 ul.form li
 {
     margin: 5px 0;
 }
+
 
 input[type="text"],
 input[type="password"]
@@ -185,13 +182,16 @@ div.center
     text-align: center;
 }
 
-div.advanced-control
+div.advanced-control.left
 {
     float: left;
 }
+div.advanced-control.right
+{
+    float: right;
+}
 div.advanced-control textarea
 {
-    height: 80px;
     font-size: 9px;
 }
 

@@ -4,21 +4,21 @@
     <p>This control panel gives you access to everything that's going on "under the hood" in Referenda. <strong>WARNING: IF YOU DON'T KNOW WHAT YOU'RE DOING, YOU CAN VERY EASILY RUIN YOUR VOTE.</strong></p>
     <p>If you don't know what ElGamal encryption and public-key cryptography are, you should leave this panel alone.</p>
     <p>Enable advanced options</p>
-    <div class="advanced-control">
+    <div class="advanced-control left">
         <label>ElGamal public key</label><br />
-        <textarea id="enc_public_key"></textarea>
+        <textarea id="enc_public_key" rows="8" cols="45"></textarea>
     </div>
-    <div class="advanced-control">
+    <div class="advanced-control right">
         <label>ElGamal secret key</label><br />
-        <textarea id="enc_secret_key"></textarea>
+        <textarea id="enc_secret_key" rows="8" cols="45"></textarea>
     </div>
-    <div class="advanced-control">
+    <div class="advanced-control left">
         <label>Plaintext ballot</label><br />
-        <textarea id="enc_plaintext_ballot"></textarea>
+        <textarea id="enc_plaintext_ballot" rows="8" cols="45"></textarea>
     </div>
-    <div class="advanced-control">
+    <div class="advanced-control right">
         <label>Ciphertext ballot</label><br />
-        <textarea id="enc_plaintext_ballot"></textarea>
+        <textarea id="enc_ciphertext_ballot" rows="8" cols="45"></textarea>
     </div>
     <div class="clear"></div>
 </div>
@@ -44,6 +44,11 @@
             {% endfor %}
             <div id="panel_finalize" style="display: none;">
                 <h2>Finalize</h2>
+                <h4>Your ballot choices:</h4>
+                <div id="final_ballot">
+                </div>
+                <p>Please take a moment to ensure that the votes you have made above are correct before submitting your ballot.</p>
+                <a id="submit_ballot" class="button submitballot">Submit ballot</a>
             </div>
         </div>
     </div>
@@ -55,7 +60,7 @@
                 {% for race in election.races.all %}
                 <li id="progress_{{ race.slug }}"><a>{{ race.name }}</a></li>
                 {% endfor %}
-                <li id="progress_finalize">Finalize</li>
+                <li id="progress_finalize"><a>Finalize</a></li>
             </ul>
         </div>
     </div>

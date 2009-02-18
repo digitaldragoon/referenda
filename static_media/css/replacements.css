@@ -8,6 +8,7 @@ a.button
     background-repeat: repeat-y;
     background-position: 0px 0px;
     cursor: pointer;
+    margin: 10px 0;
 }
 a.button:hover
 {
@@ -16,6 +17,7 @@ a.button:hover
 
 a.button.advanced
 {
+    margin: 0;
     padding-top: 99px;
     width: 54px;
     background-image: url("../img/controlpanel_button.png");
@@ -35,6 +37,11 @@ a.button.login
 a.button.continue
 {
     background-image: url("../img/button_continue.png");
+}
+a.button.submitballot
+{
+    width: 118px;
+    background-image: url("../img/button_submitballot.png");
 }
 
 #advanced-panel a.button
