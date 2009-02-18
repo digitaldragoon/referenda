@@ -404,6 +404,7 @@ class SealedVote (models.Model):
     poll = models.ForeignKey(Poll, related_name='sealedvotes')
     ballot = BallotField()
     signature = models.TextField()
+    timestamp = models.DateTimeField(auto_now=True, editable=False)
 
     def __unicode__(self):
         return '%s [%s]' % (self.user_id, self.poll)
