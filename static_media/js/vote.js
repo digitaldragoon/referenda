@@ -9,17 +9,17 @@ Session.prototype.keygen = function() {
     alert('not implemented yet');
 }
 
-function VoteControl() {
+function Controller() {
     this.session = new Session();
 }
-
 /* Display a notification to the user */
-VoteControl.prototype.display_message = function (message, node) {
-    alert(message + ' (from ' + node + ')');
+Controller.prototype.display_message = function (message, node) {
+    var btn_cancel = '<a class="button cancel simplemodal-close">Cancel</a>';
+    $.modal('<p>' + message + '</p>' + btn_cancel, {close: false});
 }
 
 /* The grand login function - authenticate and load in the election pane */
-VoteControl.prototype.login = function() {
+Controller.prototype.login = function() {
     var control = this;
     this.session.get_credentials();
     
@@ -48,12 +48,12 @@ VoteControl.prototype.login = function() {
 }
 
 /* Disable links in the header and footer to prevent accidental loss of ballot*/
-VoteControl.prototype.disable_links = function() {
+Controller.prototype.disable_links = function() {
     $('#header a').add('#footer a').each( function() { $(this).click(function() { control.display_message('Link disabled while voting!', this); return false; }); });
 }
 
 /* Load in the basic content for the election */
-VoteControl.prototype.load_content = function() {
+Controller.prototype.load_content = function() {
     this.disable_links();
     var control = this;
     $.get('../content/', function(data) {
@@ -76,7 +76,7 @@ VoteControl.prototype.load_content = function() {
 }
 
 /* Prunes list of races to those received in the login */
-VoteControl.prototype.prune_races = function(root) {
+Controller.prototype.prune_races = function(root) {
     var control = this;
     var root = root;
     var races = this.session.races;
@@ -92,7 +92,7 @@ VoteControl.prototype.prune_races = function(root) {
 }
 
 /* Set up crypto keys */
-VoteControl.prototype.configure = function () {
+Controller.prototype.configure = function () {
     var cont = document.createElement('a');
     $(cont).addClass('button').addClass('continue').click(function() {
                 control.activate_controls();
@@ -105,7 +105,7 @@ VoteControl.prototype.configure = function () {
 }
 
 /* Navigate to a particular panel */
-VoteControl.prototype.navigate_to_panel = function(panel_id) {
+Controller.prototype.navigate_to_panel = function(panel_id) {
     var current = $('#progress-frame').data('current');
     if (panel_id != current) {
         $('#panel_' + current).toggle();
@@ -115,7 +115,7 @@ VoteControl.prototype.navigate_to_panel = function(panel_id) {
 }
 
 /* Activate all of the JS interface */
-VoteControl.prototype.activate_controls = function() {
+Controller.prototype.activate_controls = function() {
     var control = this;
  
     /* nav links */
@@ -145,12 +145,17 @@ VoteControl.prototype.activate_controls = function() {
             });
 
     $('li.candidate').add('#progress-frame li').fitted();
+
+    /* submit link */
+    $('#submit_ballot').click(function() {
+                control.submit_ballot();
+            });
 }
 
 /* Select a candidate */
-VoteControl.prototype.select_candidate = function(candidate) {
+Controller.prototype.select_candidate = function(candidate) {
     var id = control.get_race_id($(candidate).closest('div.race'));
-    if (this.get_choices_left_for_race($(candidate).closest('div.race')) > 0) {
+    if (this.race_choices_left($(candidate).closest('div.race')) > 0) {
         if ($(candidate).find('input').val() == '') {
             control.display_message('please write in a name', candidate);
         }
@@ -165,24 +170,35 @@ VoteControl.prototype.select_candidate = function(candidate) {
 }
 
 /* Deselect a candidate */
-VoteControl.prototype.deselect_candidate = function(candidate) {
+Controller.prototype.deselect_candidate = function(candidate) {
     $(candidate).removeClass('selected');
     this.update_ballot();
 }
 
-/* Check to see if the maximum number of candidates for a race have been selected. Returns the difference between the number of currently selected candidates and the number of possible candidates (positive means there are still choices to make) */
-VoteControl.prototype.get_choices_left_for_race = function(race) {
-    return this.get_race_num_choices(race) - $(race).find('li.candidate.selected').length;
-}
-
 /* Returns the number of total choices for a race */
-VoteControl.prototype.get_race_num_choices = function(race) {
+Controller.prototype.race_num_choices = function(race) {
     var id = control.get_race_id(race);
     return this.session.racemap[id].fields.num_choices;
 }
 
+/* Check to see if the maximum number of candidates for a race have been selected. Returns the difference between the number of currently selected candidates and the number of possible candidates (positive means there are still choices to make) */
+Controller.prototype.race_choices_left = function(race) {
+    return this.race_num_choices(race) - $(race).find('li.candidate.selected').length;
+}
+
+/* Determines whether or not this ballot is complete. */
+Controller.prototype.ballot_is_complete = function() {
+    var control = this;
+    var complete = true;
+    $('#panel-frame').find('.race').each(function() {
+                complete = complete && control.race_choices_left(this) == 0;
+            });
+
+    return complete;
+}
+
 /* Update ballot */
-VoteControl.prototype.update_ballot = function() {
+Controller.prototype.update_ballot = function() {
     this.compute_ballot();
     this.update_nav_links();
     this.update_finalize();
@@ -190,12 +206,12 @@ VoteControl.prototype.update_ballot = function() {
 }
 
 /* Update candidate choices from ballot */
-VoteControl.prototype.update_candidates_from_ballot = function() {
+Controller.prototype.update_candidates_from_ballot = function() {
     /*FIXME - implement*/
 }
 
 /* update finalize page */
-VoteControl.prototype.update_finalize = function() {
+Controller.prototype.update_finalize = function() {
     var control = this;
 
     var ballot_text = $('#enc_plaintext_ballot').val();
@@ -227,7 +243,7 @@ VoteControl.prototype.update_finalize = function() {
 }
 
 /* Compute and update the state of the ballot */
-VoteControl.prototype.compute_ballot = function() {
+Controller.prototype.compute_ballot = function() {
     var control = this;
     var result = {};
 
@@ -244,7 +260,7 @@ VoteControl.prototype.compute_ballot = function() {
 }
 
 /* Compute the results of a single ballot race */
-VoteControl.prototype.compute_single_ballot = function (race) {
+Controller.prototype.compute_single_ballot = function (race) {
     var id = control.get_race_id(race);
     var result = {};
     result[id] = new Array();
@@ -255,13 +271,13 @@ VoteControl.prototype.compute_single_ballot = function (race) {
 }
 
 /* Update nav links with completed/noncompleted status*/
-VoteControl.prototype.update_nav_links = function () {
+Controller.prototype.update_nav_links = function () {
     $('#panel-frame').children('.race').each( function() {
-                var diff = control.get_choices_left_for_race(this);
+                var diff = control.race_choices_left(this);
                 var id = control.get_race_id(this);
                 var race_control = $('#progress_' + id);
                 if (diff > 0) {
-                    if (diff == control.get_race_num_choices($('#panel_' + id))) {
+                    if (diff == control.race_num_choices($('#panel_' + id))) {
                         $(race_control).removeClass('in-progress').removeClass('completed');
                     }
                     else {
@@ -275,7 +291,7 @@ VoteControl.prototype.update_nav_links = function () {
 }
 
 /* Set up the advanced control panel */
-VoteControl.prototype.activate_panel = function() {
+Controller.prototype.activate_panel = function() {
         var control = this;
         var panel = $('#advanced-panel');
         panel.data('state', 'closed');
@@ -316,12 +332,27 @@ VoteControl.prototype.activate_panel = function() {
 };
 
 /* Get the id of the enclosing rance */
-VoteControl.prototype.get_race_id = function (node) {
+Controller.prototype.get_race_id = function (node) {
     return $(node).closest('div.race').attr('id').split('_')[1];
 }
 
+/* Submit the ballot! */
+Controller.prototype.submit_ballot = function() {
+    var btn_submit = '<a class="button submitballot">Submit Ballot</a>';
+    var btn_cancel = '<a class="button cancel simplemodal-close">Cancel</a>';
+    var message = '<h2>Submit your ballot.</h2><p>Are you sure you want to submit your ballot? This will complete your vote.</p>';
+
+    if (control.ballot_is_complete() == false)
+    {
+        message += '<p class="warning">Warning! Your ballot is not 100% complete. By submitting now, you are choosing not to use one or more of your votes. Are you sure?</p>';
+    }
+
+    $.modal(message + btn_submit + btn_cancel, {close: false});
+
+}
+
 /* Initialize */
-control = new VoteControl();
+var control = new Controller();
 
 $(document).ready(function () {
         $('#login_submit').click(function () {

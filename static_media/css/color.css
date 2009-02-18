@@ -158,3 +158,8 @@ li.fitted.hovered
 {
     background-color: #eeeeff;
 }
+
+p.warning
+{
+    color: #ff0000;
+}

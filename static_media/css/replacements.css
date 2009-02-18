@@ -38,6 +38,10 @@ a.button.continue
 {
     background-image: url("../img/button_continue.png");
 }
+a.button.cancel
+{
+    background-image: url("../img/button_cancel.png");
+}
 a.button.submitballot
 {
     width: 118px;
@@ -90,4 +94,21 @@ li.candidate div.checkbox
 li.candidate.selected div.checkbox
 {
     background-image: url("../img/checkbox_on.png");
+}
+
+/*------------------------------------------------------------------------------
+ * MODAL DIALOGS
+ *----------------------------------------------------------------------------*/
+
+.simplemodal-overlay
+{
+    background-color: #1a1a1a;
+}
+.simplemodal-container
+{
+    padding: 20px;
+    background-color: #ffffff;
+    border: 5px #1a1a1a solid;
+    width: 400px;
+    min-height: 200px;
 }
