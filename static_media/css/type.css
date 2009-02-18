@@ -46,6 +46,11 @@ p
     margin: 8px 0;
 }
 
+label
+{
+    font-size: 12px;
+}
+
 a,
 button
 {

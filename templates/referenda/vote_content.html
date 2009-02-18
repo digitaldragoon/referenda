@@ -3,6 +3,24 @@
     <h1>Advanced Control Panel</h1>
     <p>This control panel gives you access to everything that's going on "under the hood" in Referenda. <strong>WARNING: IF YOU DON'T KNOW WHAT YOU'RE DOING, YOU CAN VERY EASILY RUIN YOUR VOTE.</strong></p>
     <p>If you don't know what ElGamal encryption and public-key cryptography are, you should leave this panel alone.</p>
+    <p>Enable advanced options</p>
+    <div class="advanced-control">
+        <label>ElGamal public key</label><br />
+        <textarea id="enc_public_key"></textarea>
+    </div>
+    <div class="advanced-control">
+        <label>ElGamal secret key</label><br />
+        <textarea id="enc_secret_key"></textarea>
+    </div>
+    <div class="advanced-control">
+        <label>Plaintext ballot</label><br />
+        <textarea id="enc_plaintext_ballot"></textarea>
+    </div>
+    <div class="advanced-control">
+        <label>Ciphertext ballot</label><br />
+        <textarea id="enc_plaintext_ballot"></textarea>
+    </div>
+    <div class="clear"></div>
 </div>
 <div class="cap top"></div>
 <div id="main">

@@ -24,6 +24,7 @@ VoteControl.prototype.login = function() {
     this.session.get_credentials();
     
     var req_data = {user_id: this.session.user_id, password: this.session.password};
+    $('#login_frame').append($(document.createElement('p')).addClass('wait').text('Logging in...'));
     $.post('.', req_data,
             function (data) {
                 if (data.success) {
@@ -41,6 +42,7 @@ VoteControl.prototype.login = function() {
                 }
                 else {
                     control.display_message(data.message);
+                    $('#login_frame .wait').remove();
                 }
             }, 'json');
 }
@@ -93,7 +95,7 @@ VoteControl.prototype.configure = function () {
             });
 
     var notice = document.createElement('p');
-    $(notice).attr('id', 'crypto-notice').addClass('wait').text('Please wait while we generate your cryptography keys...').oneTime('3s', 'keygen', function() { $(this).replaceWith(cont);});
+    $(notice).attr('id', 'crypto-notice').addClass('wait').text('Please wait while we generate your cryptography keys...').oneTime('3s', 'keygen', function() { $(this).removeClass('wait').append('done!').after(cont);});
     $('#panel_setup').append(notice);
 }
 
@@ -172,15 +174,53 @@ VoteControl.prototype.compute_ballot = function() {
     var control = this;
     $('#panel-frame').children('.race').each(function () {
                 var result = control.compute_single_ballot(this);
+                var diff = control.check_race_is_full(this);
+                var id = control.get_race_id(this);
+                var race_control = $('#progress_' + id);
+                if (diff > 0) {
+                    if (diff === control.session.racemap[id].fields.num_choices) {
+                        $(race_control).removeClass('in-progress').removeClass('completed');
+                    }
+                    else {
+                        $(race_control).addClass('in-progress').removeClass('completed');
+                    }
+                }
+                else {
+                    $(race_control).removeClass('in-progress').addClass('completed');
+                }
             });
+    
+    /* Check to see if all ballots are finished */
+    var finished = true;
+    $('#panel-frame').children('.race').each(function () {
+                finished = finished && control.check_race_is_full(this) == 0;
+            });
+
+    /* then reveal or hide finalize link */
+    if (finished) {
+        $('#progress_finalize').html('<a>Finalize</a>').find('a').click(function() {
+                    control.navigate_to_panel('finalize');
+                });
+        control.navigate_to_panel('finalize');
+    }
+    else {
+        $('#progress_finalize').html('Finalize');
+    }
 }
 
 /* Compute the results of a single ballot race */
 VoteControl.prototype.compute_single_ballot = function (race) {
     var id = control.get_race_id(race);
+    result = '';
     $(race).find('li.candidate.selected').each(function() {
-                alert($(this).find('.info input').val());
+                if (result != '') {
+                    result += ',';
+                }
+                result += '"' + $(this).find('.info input').val() + '"';
             });
+    result = '"' + id + '": [' + result + ']';
+    alert(result);
+    return result;
 }
 
 /* Set the advanced control panel to slide */

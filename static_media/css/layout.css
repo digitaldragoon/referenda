@@ -185,6 +185,16 @@ div.center
     text-align: center;
 }
 
+div.advanced-control
+{
+    float: left;
+}
+div.advanced-control textarea
+{
+    height: 80px;
+    font-size: 9px;
+}
+
 .clear + .column
 {
     margin-top: 20px;
