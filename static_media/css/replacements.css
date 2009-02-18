@@ -57,9 +57,25 @@ a.button.submitballot
 
 p.wait
 {
+    text-align: left;
     padding-left: 22px;
     line-height: 16px;
-    background: transparent url("../img/wait16.gif") 0px 0px no-repeat;
+    background: transparent url("../img/wait16white.gif") 0px 0px no-repeat;
+}
+.center p.wait
+{
+    background-image: url("../img/wait16blue.gif");
+}
+
+a.checkbox
+{
+    padding: 2px 2px 2px 20px;
+    background: url("../img/checkbox_off.png") 0px 4px no-repeat;
+    cursor: pointer;
+}
+a.checkbox.checked
+{
+    background-image: url("../img/checkbox_on.png");
 }
 
 #progress-frame li
@@ -106,9 +122,10 @@ li.candidate.selected div.checkbox
 }
 .simplemodal-container
 {
+    text-align: center;
     padding: 20px;
     background-color: #ffffff;
     border: 5px #1a1a1a solid;
     width: 400px;
-    min-height: 200px;
+    min-height: 80px;
 }

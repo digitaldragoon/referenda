@@ -1,5 +1,10 @@
-#none yet!
-class Credentials:
+class InvalidCredentials (Exception):
+    pass
+
+class Unauthorized (Exception):
+    pass
+
+class Credentials(object):
     """
     Class representing a voter's credentials.
     """
@@ -19,5 +24,6 @@ class Credentials:
     def in_group(self, group):
         return self.groups.count(group) > 0
 
-class BaseAuth:
-    pass
+class BaseAuth(object):
+    def authenticate(self, user_id, password):
+        raise NotImplementedError

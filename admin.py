@@ -20,3 +20,7 @@ admin.site.register(WriteInCandidate, WriteInCandidateAdmin)
 class ElectionAuthorityAdmin(admin.ModelAdmin):
     pass
 admin.site.register(ElectionAuthority, ElectionAuthorityAdmin)
+
+class SealedVoteAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(SealedVote, SealedVoteAdmin)

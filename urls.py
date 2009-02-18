@@ -12,5 +12,6 @@ urlpatterns = patterns('',
 
     url(r'^election/(?P<slug>[-_a-z0-9]+)/$', object_detail, {'queryset': Election.objects.all(),'template_name': 'referenda/election_detail.html'}, name='referenda.election_detail'),
     url(r'^election/(?P<slug>[-_a-z0-9]+)/vote/$', 'referenda.views.voter_login', name='referenda.voter_login'),
+    url(r'^election/(?P<slug>[-_a-z0-9]+)/submit/$', 'referenda.views.submit_ballot', name='referenda.submit_ballot'),
     url(r'^election/(?P<slug>[-_a-z0-9]+)/content/$', 'referenda.views.vote_content', name='referenda.vote_content'),
 )

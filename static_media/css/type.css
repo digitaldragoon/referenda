@@ -64,7 +64,8 @@ dt
     font-weight: bold;
     font-size: 14px;
 }
-dt .link
+dt .link,
+dd .link
 {
     font-size: 9px;
     vertical-align: middle;
@@ -95,7 +96,8 @@ li
 {
     font-size: 12px;
 }
-li.candidate h3
+li.candidate h3,
+li.election h3
 {
     font-size: 18px;
 }

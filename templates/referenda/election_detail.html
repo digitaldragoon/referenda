@@ -5,7 +5,7 @@
 {% block main %}
 <div class="column long">
     <h1>{{ object.name }}</h1>
-    <p>Polls open <strong>{{ object.poll_opens|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_opens|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.
+    <p>Polls open <strong>{{ object.poll_opens|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_opens|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>
     <p>Polls close <strong>{{ object.poll_closes|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_closes|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>
     {% if object.valid %}<a class="button votenow" href="{% url referenda.voter_login object.slug %}">Vote Now!</a>{% endif %}
 </div>
@@ -13,11 +13,11 @@
     <h1>Administrators</h1>
     <dl>
         <dt>Adminstrator <span class="link">(<a href="#">login&nbsp;&#187;</a>)</span></dt>
-        <dd><a href="mailto:{{ object.administrator.email }}">{{ object.administrator.first_name }} {{ object.administrator.last_name }}</a></dd>
+        <dd>{{ object.administrator.first_name }} {{ object.administrator.last_name }} <span class="link">(<a href="mailto:{{ object.administrator.email }}">contact</a>)</span></dd>
         <dt>Election Authorities <span class="link">(<a href="#">login&nbsp;&#187;</a>)</span></dt>
         {% if object.authorities %}
         {% for authority in object.authorities.all %}
-        <dd><a href="mailto:{{ authority.user.email }}">{{ authority.user.first_name }} {{ authority.user.last_name }}</a></dd>
+        <dd>{{ authority.user.first_name }} {{ authority.user.last_name }} <span class="link">(<a href="mailto:{{ authority.user.email }}">contact</a>)</span></dd>
         {% endfor %}
         {% else %}
         <dd>This election does not currently have any election authorities.</dd>

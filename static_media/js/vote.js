@@ -1,12 +1,41 @@
+/* an object with some methods for handling modal dialogs */
+var dialog = {
+    close: function(dialog) {
+                dialog.container.fadeOut(300, function() {
+                            dialog.overlay.slideUp(300, function() {
+                            $.modal.close();
+                            });
+                        });
+           },
+    open: function(dialog) {
+                dialog.overlay.slideDown(300, function() {
+                        dialog.container.fadeIn(300, function() {
+                                dialog.data.show();
+                            });
+                        });
+          },
+    showHigh: function(dialog) {
+                dialog.container.css('top', '100px');
+          }
+};
+$.modal.defaults.onClose = dialog.close;
+$.modal.defaults.onOpen = dialog.open;
+
+function Ballot() {
+}
+Ballot.prototype.json = function() {
+    return $('#enc_plaintext_ballot').val();
+}
+
 function Session() {
-    this.setup_complete = false;
+    this.ballot = new Ballot();
 }
 Session.prototype.get_credentials = function() {
     this.user_id = $('#login_user_id').val();
     this.password = $('#login_password').val();
 }
 Session.prototype.keygen = function() {
-    alert('not implemented yet');
+    $('#enc_public_key').val('none');
 }
 
 function Controller() {
@@ -14,8 +43,11 @@ function Controller() {
 }
 /* Display a notification to the user */
 Controller.prototype.display_message = function (message, node) {
-    var btn_cancel = '<a class="button cancel simplemodal-close">Cancel</a>';
-    $.modal('<p>' + message + '</p>' + btn_cancel, {close: false});
+    var btn_cont = '<a class="button continue simplemodal-close">Continue</a>';
+    $.modal('<p>' + message + '</p>' + btn_cont, 
+            {
+                close: false,
+            });
 }
 
 /* The grand login function - authenticate and load in the election pane */
@@ -25,9 +57,13 @@ Controller.prototype.login = function() {
     
     var req_data = {user_id: this.session.user_id, password: this.session.password};
     $('#login_frame').append($(document.createElement('p')).addClass('wait').text('Logging in...'));
-    $.post('.', req_data,
-            function (data) {
-                if (data.success) {
+    $.ajax({
+            type: 'POST',
+            url: '.',
+            dataType: 'json',
+            data: req_data,
+            success: function (data) {
+                if (data.status == 'success') {
                     control.session.races = data.races;
                     control.session.friendly_name = data.friendly_name
                     control.session.user_id = data.user_id
@@ -39,12 +75,33 @@ Controller.prototype.login = function() {
                     }
 
                     control.load_content();
+                    document.title = 'Referenda - Vote';
                 }
-                else {
+                else if (data.status == 'invalid') {
                     control.display_message(data.message);
                     $('#login_frame .wait').remove();
                 }
-            }, 'json');
+                else if (data.status == 'forbidden') {
+                    control.display_message(data.message);
+                    $('#login_frame .wait').remove();
+                    $('.simplemodal-data .button.continue').click(function() {
+                                window.location = '..';
+                            });
+                }
+                else if (data.status == 'duplicate') {
+                    control.display_message(data.message);
+                    $('#login_frame .wait').remove();
+                    $('.simplemodal-data .button.continue').click(function() {
+                                window.location = '..';
+                            });
+                }
+            },
+            error: function (data) {
+                control.display_message('The server encountered an error while aattempting to log you in. Please try again in a few moments. If the problem persists, <a href="..">contact the administrator</a>.');
+                $('#login_frame .wait').remove();
+
+            }
+        });
 }
 
 /* Disable links in the header and footer to prevent accidental loss of ballot*/
@@ -101,6 +158,7 @@ Controller.prototype.configure = function () {
 
     var notice = document.createElement('p');
     $(notice).attr('id', 'crypto-notice').addClass('wait').text('Please wait while we generate your cryptography keys...').oneTime('3s', 'keygen', function() { $(this).removeClass('wait').append('done!').after(cont);});
+    this.session.keygen();
     $('#panel_setup').append(notice);
 }
 
@@ -120,9 +178,11 @@ Controller.prototype.activate_controls = function() {
  
     /* nav links */
     $('#progress-frame').data('current', 'setup');
-    $('#progress-frame li a').click(function() {
-                var id = $(this).closest('li').attr('id').split('_')[1];
-                control.navigate_to_panel(id);
+    $('#progress-frame li a').each(function() {
+                $(this).closest('li').click(function() {
+                    var id = $(this).closest('li').attr('id').split('_')[1];
+                    control.navigate_to_panel(id);
+                });
             });
     $('#progress_setup').removeClass('in-progress').addClass('completed');
 
@@ -144,11 +204,35 @@ Controller.prototype.activate_controls = function() {
                 }
             });
 
-    $('li.candidate').add('#progress-frame li').fitted();
+    $('li.candidate').add('#progress-frame li a').each(function() {
+                $(this).closest('li').fitted();
+            });
 
     /* submit link */
     $('#submit_ballot').click(function() {
+                var message_pane = $('#submission-pane .message-pane');
+                if (control.ballot_is_complete())
+                {
+                    message_pane.html('');
+                }
+                else
+                {
+                    message_pane.html('<p class="warning">Warning! Your ballot is not 100% complete. By submitting now, you are choosing not to use one or more of your votes. Are you sure?</p>');
+                }
+                $('#submission-pane').modal({
+                            close: false,
+                            onShow: dialog.showHigh,
+                        });
+
+            });
+    $('#submission-pane .button.submitballot').click(function() {
                 control.submit_ballot();
+                $(this).unbind('click');
+            });
+
+    /* protect advanced panel from tab focus */
+    $('#advanced-panel textarea').focus(function(e) {
+                control.open_panel(true);
             });
 }
 
@@ -157,7 +241,7 @@ Controller.prototype.select_candidate = function(candidate) {
     var id = control.get_race_id($(candidate).closest('div.race'));
     if (this.race_choices_left($(candidate).closest('div.race')) > 0) {
         if ($(candidate).find('input').val() == '') {
-            control.display_message('please write in a name', candidate);
+            control.display_message('Please write in a name to select a write-in candidate.', candidate);
         }
         else {
             $(candidate).addClass('selected');
@@ -165,7 +249,10 @@ Controller.prototype.select_candidate = function(candidate) {
         }
     }
     else {
-        control.display_message('You may only select ' + this.session.racemap[id].fields.num_choices + ' candidates.', candidate);
+        var numc = this.session.racemap[id].fields.num_choices;
+        if (numc <= 1) { var plural = 'candidate'; }
+        else { var plural = 'candidates'; }
+        control.display_message('You may only select ' + this.session.racemap[id].fields.num_choices + ' ' + plural + '.', candidate);
     }
 }
 
@@ -305,23 +392,11 @@ Controller.prototype.activate_panel = function() {
         panel.find('.button').click(function() {
             if (panel.data('state') == 'closed')
             {
-                if (jQuery.browser.msie) { var rightVal = '760px'; }
-                else { var rightVal = '0px';}
-
-                panel.animate({
-                    right: rightVal
-                }, 'normal');
-                panel.data('state', 'open');
+                control.open_panel(false);
             }
             else
             {
-                if (jQuery.browser.msie) { var rightVal = '0px'; }
-                else { var rightVal = '-760px';}
-
-                panel.animate({
-                    right: rightVal
-                }, 'normal');
-                panel.data('state', 'closed');
+                control.close_panel(false);
             }
         });
 
@@ -329,7 +404,62 @@ Controller.prototype.activate_panel = function() {
         $('#enc_plaintext_ballot').blur(function() {
                     control.update_finalize()
                 }); 
+
+        /* Reveal advanced controls */
+        $('#advanced-panel-gate').click(function() {
+                    if ($(this).hasClass('checked')) {
+                        $(this).removeClass('checked');
+                        $('#advanced-panel-controls').css('visibility', 'hidden');
+                    }
+                    else {
+                        $(this).addClass('checked');
+                        $('#advanced-panel-controls').css('visibility', 'visible');
+
+                    }
+                });
 };
+
+/* open the advanced panel */
+Controller.prototype.open_panel = function(instant) {
+    var panel = $('#advanced-panel');
+    if (panel.data('state') == 'closed')
+    {
+        if (jQuery.browser.msie) { var rightVal = '760px'; }
+        else { var rightVal = '0px';}
+
+        if (instant) {
+            panel.css('right', rightVal);
+        }
+        else
+        {
+            panel.animate({
+                    right: rightVal
+                }, 'normal');
+        }
+        panel.data('state', 'open');
+    }
+}
+
+/* close the advanced panel */
+Controller.prototype.close_panel = function(instant) {
+    var panel = $('#advanced-panel');
+    if (panel.data('state') == 'open')
+    {
+        if (jQuery.browser.msie) { var rightVal = '0px'; }
+        else { var rightVal = '-760px';}
+
+        if (instant) {
+            panel.css('right', rightVal);
+        }
+        else
+        {
+            panel.animate({
+                    right: rightVal
+                }, 'normal');
+        }
+        panel.data('state', 'closed');
+    }
+}
 
 /* Get the id of the enclosing rance */
 Controller.prototype.get_race_id = function (node) {
@@ -338,17 +468,77 @@ Controller.prototype.get_race_id = function (node) {
 
 /* Submit the ballot! */
 Controller.prototype.submit_ballot = function() {
-    var btn_submit = '<a class="button submitballot">Submit Ballot</a>';
-    var btn_cancel = '<a class="button cancel simplemodal-close">Cancel</a>';
-    var message = '<h2>Submit your ballot.</h2><p>Are you sure you want to submit your ballot? This will complete your vote.</p>';
+    var control = this;
+    $('#submission-pane').append('<p class="wait">Submitting your ballot...</p>');
 
-    if (control.ballot_is_complete() == false)
-    {
-        message += '<p class="warning">Warning! Your ballot is not 100% complete. By submitting now, you are choosing not to use one or more of your votes. Are you sure?</p>';
+    var data = {
+        user_id: this.session.user_id,
+        password: this.session.password,
+        ballot:  this.session.ballot.json(),
+        public_key: $('#enc_public_key').val(),
+        signature: 'none'
+    };
+
+    $.ajax({
+                type: 'POST',
+                url: '../submit/',
+                dataType: 'json',
+                data: data,
+                success: function(data) {
+                    $('#submission-pane').fadeOut(200, function() {
+                        control.handle_submit_response(data);
+                        });
+                },
+                error: function(data) {
+                    $('#submission-pane').fadeOut(200, function() {
+                        control.handle_submit_error(data);
+                        });
+                }
+            });
+}
+
+/* Handle response to ballot submission */
+Controller.prototype.handle_submit_response = function(data) {
+    var control = this;
+    var pane = $('#submission-pane');
+    pane.empty();
+    if (data.status == 'success') {
+        pane.append('<h1>Success!</h1>');
+        pane.append('<p>' + data.message + '</p>');
+        pane.append('<p><strong>Your receipt:</strong> ' + data.receipt + '</p>');
+        pane.append($('<a class="button continue">Continue</a>').click(function() { $.modal.close(); window.location = '../../../'; }));
+    }
+    else if (data.status == 'duplicate') {
+        pane.append('<h1>Duplicate Vote</h1>');
+        pane.append('<p>' + data.message + '</p');
+        pane.append('<p>If you believe that you have received this message in error, please <a href="..">contact the administrator</a>.</p>');
+        pane.append($('<a class="button cancel">Cancel</a>').click(function() { $.modal.close(); }));
+    }
+    else if (data.status == 'forbidden') {
+        pane.append('<h1>Authorization Failed</h1>');
+        pane.append('<p>' + data.message + '</p');
+        pane.append('<p>You may try again by entering your username and password below. If the problem persists, please <a href="..">contact the administrator</a>.</p>');
+        pane.append('<ul class="form"><li><input type="text" id="login_user_id" value="' + control.session.user_id + '" /></li><li><input type="password" id="login_password" value="' + control.session.password + '" /></li></ul>');
+        pane.append($('<a class="button submitballot">Submit ballot</a>').click(function() { control.session.get_credentials(); control.submit_ballot(); }));
+        pane.append($('<a class="button cancel">Cancel</a>').click(function() { $.modal.close(); }));
+    }
+    else if (data.status == 'invalid') {
+        pane.append('<h1>Corrupted Vote</h1>');
+        pane.append('<p>' + data.message + '</p');
+        pane.append('<p>Please re-check your ballot selections. If the problem persists, please <a href="..">contact the administrator</a>.</p>');
+        pane.append($('<a class="button cancel">Cancel</a>').click(function() { $.modal.close(); }));
     }
 
-    $.modal(message + btn_submit + btn_cancel, {close: false});
+    pane.fadeIn(200);
+}
 
+/* Handle server error on ballot submission */
+Controller.prototype.handle_submit_error = function(data) {
+    var pane = $('#submission-pane');
+    pane.empty();
+    pane.append('<h1>Server Error</h1><p>The server has encountered an error while trying to process your data. Please try again in a few moments. If the problem persists, <a href="..">contact the administrator</a>.');
+    pane.append($('<a class="button continue">Continue</a>').click(function() { $.modal.close() }));
+    pane.fadeIn(200);
 }
 
 /* Initialize */

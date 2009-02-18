@@ -363,7 +363,7 @@ class BallotCandidate (Candidate):
     """
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    bio = models.CharField(max_length=500, blank=True)
+    bio = models.CharField(max_length=1000, blank=True)
 
     def _get_full_name(self):
         return "%s %s" % (self.first_name, self.last_name)
@@ -400,9 +400,13 @@ class SealedVote (models.Model):
     A finished vote uploaded by a voter.
     """
     user_id = models.CharField(max_length=100)
-    poll = models.ForeignKey(Poll)
+    public_key = models.TextField()
+    poll = models.ForeignKey(Poll, related_name='sealedvotes')
     ballot = BallotField()
     signature = models.TextField()
+
+    def __unicode__(self):
+        return '%s [%s]' % (self.user_id, self.poll)
 
     class Meta:
         unique_together = ('user_id', 'poll')
