@@ -26,12 +26,6 @@ class BallotCandidateAdmin(admin.ModelAdmin):
     list_select_related = True
 admin.site.register(BallotCandidate, BallotCandidateAdmin)
 
-class WriteInCandidateAdmin(admin.ModelAdmin):
-    list_display = ('name', 'race')
-    list_filter = ('race',)
-    list_select_related = True
-admin.site.register(WriteInCandidate, WriteInCandidateAdmin)
-
 class ElectionAuthorityAdmin(admin.ModelAdmin):
     list_display = ('user', 'election', 'approved',)
     list_filter = ('election',)

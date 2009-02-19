@@ -343,11 +343,19 @@ class Referendum (models.Model):
     class Meta:
         ordering = ['election', 'name']
 
+class CandidateManager (models.Manager):
+    use_for_related_fields = True
+
+    def random(self):
+        return self.order_by('?')
+
 class Candidate (models.Model):
     """
     The superclass for candidates in Races.
     """
     race = models.ForeignKey(Race, related_name="candidates")
+
+    objects = CandidateManager()
 
     template = 'referenda/ballotcandidate.html'
 
@@ -397,25 +405,6 @@ try:
         candidate = models.OneToOneField(BallotCandidate, related_name='photo')
 except ImportError:
     pass
-
-class WriteInCandidate (Candidate):
-    """
-    A write-in candidate for a Race.
-    """
-    name = models.CharField(max_length=250)
-
-    template = 'referenda/ballotcandidate.html'
-
-    def _get_full_name(self):
-        return name
-    full_name = property(_get_full_name)
-
-    def __unicode__(self):
-        return self.full_name
-
-    class Meta:
-        verbose_name = 'Write-in Candidate'
-        ordering = ['race', 'name']
 
 class SealedVote (models.Model):
     """
