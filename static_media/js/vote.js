@@ -171,7 +171,7 @@ Controller.prototype.navigate_to_panel = function(panel_id) {
     var current = $('#progress-frame').data('current');
     if (panel_id != current) {
         $.scrollTo({top:'0px'}, 200);
-        $(document).oneTime(200, 'scroll', function() {
+        $(document).oneTime(300, 'scroll', function() {
             $('#progress_' + current).removeClass('current');
             $('#panel_' + current).hide();
             $('#panel_' + panel_id).show();
