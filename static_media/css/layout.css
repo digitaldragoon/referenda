@@ -217,6 +217,7 @@ li.candidate div.photo
 li.candidate div.info
 {
     float: left;
+    width: 385px;
 }
 li.candidate input
 {
