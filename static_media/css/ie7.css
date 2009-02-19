@@ -1,9 +1,25 @@
+*
+{
+    margin: auto;
+    padding: auto;
+}
+
 #advanced-panel
 {
     margin-right: -20px;
 }
 
-li.election.hover
+li.candidate
 {
-    background-position: 8px 15px;
+    height: 100%;
+    padding: 10px 10px 9px 10px;
+}
+li.election
+{
+    height: 100%;
+    background-position: 8px 25px;
+}
+li.election.hovered
+{
+    background-position: 7px 24px;
 }

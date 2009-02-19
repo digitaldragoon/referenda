@@ -2,6 +2,10 @@
 {
     height: 100%;
 }
+#content-pane
+{
+    height: 100%;
+}
 
 #frame .bkgd
 {
@@ -13,9 +17,14 @@
     height: 300px;
 }
 
-li.election.hover
+li.election.hovered
 {
-    padding: 7px 7px 7px 24px;
+    padding-left: 24px;
+}
+li.candidate.hovered
+{
+    padding-left: 9px;
+    padding-top: 9px;
 }
 
 #js-warning
@@ -27,4 +36,16 @@ li.election.hover
 .button.advanced
 {
     background-image: url("../img/controlpanel_button_ie6.png");
+}
+
+#progress-frame li.current
+{
+    background-image: url("../img/current_arrow.png");
+}
+
+#progress-frame li.hovered
+{
+    border: none;
+    padding-top: 0;
+    padding-bottom: 0;
 }

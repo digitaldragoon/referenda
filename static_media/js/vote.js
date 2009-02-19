@@ -14,12 +14,19 @@ var dialog = {
                             });
                         });
           },
+    show: function(dialog) {
+                $(document).oneTime(800, 'foc',  function() {
+                            dialog.data.find('a.button')[0].focus();
+                        });
+          },
     showHigh: function(dialog) {
                 dialog.container.css('top', '100px');
           }
 };
+$.modal.defaults.close = false;
 $.modal.defaults.onClose = dialog.close;
 $.modal.defaults.onOpen = dialog.open;
+$.modal.defaults.onShow = dialog.show;
 
 function Ballot() {
 }
@@ -43,11 +50,8 @@ function Controller() {
 }
 /* Display a notification to the user */
 Controller.prototype.display_message = function (message, node) {
-    var btn_cont = '<a class="button continue simplemodal-close">Continue</a>';
-    $.modal('<p>' + message + '</p>' + btn_cont, 
-            {
-                close: false,
-            });
+    var btn_cont = '<a href="" class="button continue simplemodal-close">Continue</a>';
+    $.modal('<p>' + message + '</p>' + btn_cont); 
 }
 
 /* The grand login function - authenticate and load in the election pane */
@@ -78,19 +82,19 @@ Controller.prototype.login = function() {
                     document.title = 'Referenda - Vote';
                 }
                 else if (data.status == 'invalid') {
+                    $('#login_frame p.wait').remove();
                     control.display_message(data.message);
-                    $('#login_frame .wait').remove();
                 }
                 else if (data.status == 'forbidden') {
+                    $('#login_frame p.wait').remove();
                     control.display_message(data.message);
-                    $('#login_frame .wait').remove();
                     $('.simplemodal-data .button.continue').click(function() {
                                 window.location = '..';
                             });
                 }
                 else if (data.status == 'duplicate') {
+                    $('#login_frame p.wait').remove();
                     control.display_message(data.message);
-                    $('#login_frame .wait').remove();
                     $('.simplemodal-data .button.continue').click(function() {
                                 window.location = '..';
                             });
@@ -106,7 +110,7 @@ Controller.prototype.login = function() {
 
 /* Disable links in the header and footer to prevent accidental loss of ballot*/
 Controller.prototype.disable_links = function() {
-    $('#header a').add('#footer a').each( function() { $(this).click(function() { control.display_message('Link disabled while voting!', this); return false; }); });
+    $('#header a').add('#footer a').each( function() { $(this).click(function(e) { e.preventDefault(); control.display_message('Link disabled while voting!', this); }); });
 }
 
 /* Load in the basic content for the election */
@@ -166,12 +170,14 @@ Controller.prototype.configure = function () {
 Controller.prototype.navigate_to_panel = function(panel_id) {
     var current = $('#progress-frame').data('current');
     if (panel_id != current) {
-        $('#progress_' + current).removeClass('current');
-        $('#panel_' + current).hide(0, function() {
-                });
-        $('#panel_' + panel_id).show();
-        $('#progress-frame').data('current', panel_id);
-        $('#progress_' + panel_id).addClass('current');
+        $.scrollTo({top:'0px'}, 200);
+        $(document).oneTime(200, 'scroll', function() {
+            $('#progress_' + current).removeClass('current');
+            $('#panel_' + current).hide();
+            $('#panel_' + panel_id).show();
+            $('#progress-frame').data('current', panel_id);
+            $('#progress_' + panel_id).addClass('current');
+            });
     }
 }
 
@@ -226,7 +232,7 @@ Controller.prototype.activate_controls = function() {
                             control.navigate_to_next_panel();
                         });
 
-                    var content = $('<div><p>You have not used all of your votes in this race. Are you sure you want to continue? You may change your vote later by clicking on one of the links to the right.</p></div>')
+                    var content = $('<div><p>You have not used all of your votes in this race (<strong>choose&nbsp;up&nbsp;to&nbsp;' + control.race_num_choices($(this).closest('div.race')) + '</strong>). Are you sure you want to continue? You may change your vote later by clicking on one of the links to the right.</p></div>')
                    content.append(btn_cont).append('<a class="button cancel simplemodal-close">Cancel</a>');
                    $.modal(content);
                 }
@@ -247,8 +253,10 @@ Controller.prototype.activate_controls = function() {
                     message_pane.html('<p class="warning">Warning! Your ballot is not 100% complete. By submitting now, you are choosing not to use one or more of your votes. Are you sure?</p>');
                 }
                 $('#submission-pane').modal({
-                            close: false,
-                            onShow: dialog.showHigh,
+                            onShow: function(d) {
+                                dialog.show(d);
+                                dialog.showHigh(d);
+                                }
                         });
 
             });
