@@ -29,7 +29,7 @@ def voter_login (request, slug):
     from referenda.auth.standard import *
     election = Election.objects.get(slug=slug)
 
-    if not election.valid:
+    if not election.is_submissible:
         raise Http404
 
     # authenticate user and return data to client
@@ -72,7 +72,7 @@ def submit_ballot (request, slug):
         except Election.DoesNotExist:
             raise Http404
         else:
-            if election.poll_currently_open:
+            if election.is_submissible:
 
                 form = SealedVoteForm(request.POST)
 

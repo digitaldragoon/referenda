@@ -31,7 +31,7 @@
     <ul>
         {% for election in past_elections %}
         <li class="election small">
-        <a class="title-link" href="#">{{ election.name }}</a> <span class="annotation grey">{{ election.poll_opens.date }}</span>
+        <a class="title-link" href="{% url referenda.election_detail slug=election.slug %}">{{ election.name }}</a> <span class="annotation grey">{{ election.poll_opens.date }}</span>
         </li>
         {% endfor %}
     </ul>

@@ -9,6 +9,14 @@ class RaceAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name',)}
 admin.site.register(Race, RaceAdmin)
 
+try:
+    from photologue.models import ImageModel
+    class BallotCandidatePhotoAdmin(admin.ModelAdmin):
+        list_display = ['image', 'date_taken', 'admin_thumbnail']
+    admin.site.register(BallotCandidatePhoto, BallotCandidatePhotoAdmin)
+except ImportError:
+    pass
+
 class BallotCandidateAdmin(admin.ModelAdmin):
     pass
 admin.site.register(BallotCandidate, BallotCandidateAdmin)

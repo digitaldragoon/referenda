@@ -1,8 +1,8 @@
-{% if election.poll_currently_open %}
+{% if election.is_current %}
 
 <li class="election{% if election.valid %}{% else %} invalid{% endif %}">
 <h3><a class="title-link" href="{% url referenda.election_detail slug=election.slug %}">{{ election.name }}</a> <span class="annotation grey">{% if election.valid %}polls close in {% ifnotequal election.days_remaining 0 %}{{election.days_remaining }}d {% endifnotequal %}{% ifnotequal election.hours_remaining 0 %}{{ election.hours_remaining }}h {% endifnotequal %}{{ election.minutes_remaining }}m{% else %}suspended{% endif %}</span></h3>
-{% if election.valid %}
+{% if election.is_submissible %}
 <p>Polls are open! Click here to vote.</p>
 {% else %}
 <p>Voting has been temporarily suspended because of an inconsistency in the voting process. Please <a>contact the administrator</a> for more details.</p>

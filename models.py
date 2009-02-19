@@ -154,10 +154,20 @@ class Poll (models.Model):
         return self._get_minutes_delta(self.poll_opens)
     minutes_until = property(_get_minutes_until)
 
-    def _get_poll_currently_open (self):
+    def _get_is_current (self):
         now = datetime.now()
-        return now < self.poll_closes and now > self.poll_opens
-    poll_currently_open = property(_get_poll_currently_open)
+        return now < self.poll_closes and now >= self.poll_opens
+    is_current = property(_get_is_current)
+
+    def _get_is_upcoming (self):
+        now = datetime.now()
+        return now < self.poll_opens
+    is_upcoming = property(_get_is_upcoming)
+
+    def _get_is_past (self):
+        now = datetime.now()
+        return now >= self.poll_closes
+    is_past = property(_get_is_past)
 
     def save(self):
         self._child_type = self.__class__.__name__
@@ -256,6 +266,10 @@ class Election (Poll):
                 final_races.append(race.pk)
 
         return serializers.serialize('python', self.races.filter(pk__in=final_races), fields=('name', 'slug', 'num_choices'))
+
+    def _get_is_submissible (self):
+        return self.is_current and self.active and self.valid 
+    is_submissible = property(_get_is_submissible)
 
 class ElectionAuthority (models.Model):
     """
@@ -375,6 +389,13 @@ class BallotCandidate (Candidate):
     class Meta:
         verbose_name = 'Ballot Candidate'
         ordering = ['race', 'last_name', 'first_name']
+
+try:
+    from photologue import models as photologue
+    class BallotCandidatePhoto (photologue.ImageModel):
+        candidate = models.OneToOneField(BallotCandidate, related_name='photo')
+except ImportError:
+    pass
 
 class WriteInCandidate (Candidate):
     """

@@ -166,10 +166,20 @@ Controller.prototype.configure = function () {
 Controller.prototype.navigate_to_panel = function(panel_id) {
     var current = $('#progress-frame').data('current');
     if (panel_id != current) {
-        $('#panel_' + current).toggle();
-        $('#panel_' + panel_id).toggle();
+        $('#progress_' + current).removeClass('current');
+        $('#panel_' + current).hide(0, function() {
+                });
+        $('#panel_' + panel_id).show();
         $('#progress-frame').data('current', panel_id);
+        $('#progress_' + panel_id).addClass('current');
     }
+}
+
+/* Navigate to next panel */
+Controller.prototype.navigate_to_next_panel = function() {
+    var frame = $('#progress-frame');
+    var next_id = frame.find('#progress_' + frame.data('current')).next().attr('id').split('_')[1];
+    this.navigate_to_panel(next_id);
 }
 
 /* Activate all of the JS interface */
@@ -206,6 +216,23 @@ Controller.prototype.activate_controls = function() {
 
     $('li.candidate').add('#progress-frame li a').each(function() {
                 $(this).closest('li').fitted();
+            });
+
+    /* cast vote button */
+    $('.race .button.castvote').click(function() {
+                if (control.race_choices_left($(this).closest('div.race')) > 0){
+                    var btn_cont = $('<a class="button continue simplemodal-close">Continue</a>');
+                    btn_cont.click(function() {
+                            control.navigate_to_next_panel();
+                        });
+
+                    var content = $('<div><p>You have not used all of your votes in this race. Are you sure you want to continue? You may change your vote later by clicking on one of the links to the right.</p></div>')
+                   content.append(btn_cont).append('<a class="button cancel simplemodal-close">Cancel</a>');
+                   $.modal(content);
+                }
+                else {
+                    control.navigate_to_next_panel();
+                }
             });
 
     /* submit link */

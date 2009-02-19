@@ -5,9 +5,18 @@
 {% block main %}
 <div class="column long">
     <h1>{{ object.name }}</h1>
-    <p>Polls open <strong>{{ object.poll_opens|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_opens|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>
-    <p>Polls close <strong>{{ object.poll_closes|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_closes|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>
-    {% if object.valid %}<a class="button votenow" href="{% url referenda.voter_login object.slug %}">Vote Now!</a>{% endif %}
+    {% if object.is_upcoming %}<p>This election is scheduled to begin soon. Polls open <strong>{{ object.poll_opens|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_opens|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>{% endif %}
+    {% if object.is_current %}<p>This election is currently in progress. Polls close <strong>{{ object.poll_closes|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_closes|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>{% endif %}
+    {% if object.is_past %}<p>This election is over.</p>{% endif %}
+    <h2>Races for this election</h2>
+    {% if object.races.all %}
+    <ul>
+        {% for race in object.races.all %}
+        <li>{{ race.name }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if object.is_submissible %}<a class="button votenow" href="{% url referenda.voter_login object.slug %}">Vote Now!</a>{% endif %}
 </div>
 <div class="column short">
     <h1>Administrators</h1>

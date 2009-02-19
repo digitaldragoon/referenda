@@ -47,6 +47,10 @@ a.button.submitballot
     width: 118px;
     background-image: url("../img/button_submitballot.png");
 }
+a.button.castvote
+{
+    background-image: url("../img/button_castvote.png");
+}
 
 #advanced-panel a.button
 {
@@ -97,6 +101,14 @@ a.checkbox.checked
 #progress-frame li.completed
 {
     background-image: url("../img/checkbox_on.png");
+}
+#progress-frame li.current
+{
+    background-image: url("../img/current_arrow.png");
+}
+#progress-frame li.hovered.current
+{
+    background-image: url("../img/current_arrow_blue.png");
 }
 
 li.candidate div.checkbox
