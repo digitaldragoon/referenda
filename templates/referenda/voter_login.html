@@ -21,6 +21,12 @@
                 $("#login_password").keypress(submit_on_enter).watermark("password");
             });
 </script>
+<!--[if lte IE 6]><script type="text/javascript">
+    /* Silly script to get rid of IE6 footer problems that arise from changing the length of the page content with JavaScript. Consider this your "bad browser tax." */
+    $(document).ready(function() {
+                $('#footer').fadeOut(300);
+            });
+</script><![endif]-->
 {% endblock %}
 
 {% block main %}
