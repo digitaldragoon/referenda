@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.core import serializers
+from django.core.exceptions import *
 from referenda import utils
 
 ################################################################################
@@ -429,6 +430,12 @@ class SealedVote (models.Model):
 
     def __unicode__(self):
         return '%s [%s]' % (self.user_id, self.poll)
+
+    def save (self):
+        if self.poll.election.is_submissible:
+            super(SealedVote, self).save()
+        else:
+            raise PermissionDenied, 'election is not currently accepting votes.'
 
     class Meta:
         unique_together = ('user_id', 'poll')
