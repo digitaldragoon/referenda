@@ -140,7 +140,7 @@ class Poll (models.Model):
     hours_remaining = property(_get_hours_remaining)
 
     def _get_minutes_remaining (self):
-        return self._get_hours_delta(self.poll_closes)
+        return self._get_minutes_delta(self.poll_closes)
     minutes_remaining = property(_get_minutes_remaining)
 
     def _get_days_until(self):
