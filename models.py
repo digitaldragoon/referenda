@@ -15,10 +15,12 @@ class CommaSeparatedListField(models.TextField):
     """
     Field which transparently translates between database comma-separated strings and lists of strings.
     """
-    # Django likes to call to_python twice for some reason, so we hack this
-    # magic string when we're on our way to the database rather than
-    # to python
-    MAGIC_STRING = u'\b\u0223\u0195'
+    # Django likes to call to_python twice when saving to the database for some
+    # reason, so we tack this magic string onto the front when we're on our way
+    # to the database rather than to python. This allows us to identify whether
+    # we should pass the string through to the database or create a list from it
+    # for use in the code.
+    MAGIC_STRING = u'\b\u0223\u0195cq.;*}Dhc=#%(iM(9s]\\w#\']u?,$08 8G/v(6967W%'
     __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
