@@ -414,16 +414,16 @@ class SealedVote (models.Model):
     """
     user_id = models.CharField(max_length=100)
     public_key = models.TextField()
-    poll = models.ForeignKey(Poll, related_name='sealedvotes')
+    race = models.ForeignKey(Race, related_name='sealedvotes')
     ballot = BallotField()
     signature = models.TextField()
     timestamp = models.DateTimeField(auto_now=True, editable=False)
 
     def __unicode__(self):
-        return '%s [%s]' % (self.user_id, self.poll)
+        return '%s [%s]' % (self.user_id, self.race)
 
     def save (self):
-        if self.poll.election.is_submissible:
+        if self.race.election.is_submissible:
             super(SealedVote, self).save()
         else:
             raise PermissionDenied, 'election is not currently accepting votes.'

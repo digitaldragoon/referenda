@@ -17,13 +17,13 @@ def preview (request, slug):
                                   locals(),
                                   context_instance=RequestContext(request))
 
-def vote_content (request, slug):
+def ballot_content (request, slug):
     try:
         election = Election.objects.get(slug=slug)
     except Election.DoesNotExist:
         raise Http404
     else:
-        return render_to_response('referenda/vote_content.html',
+        return render_to_response('referenda/ballot_content.html',
                                   locals(),
                                   context_instance=RequestContext(request))
 

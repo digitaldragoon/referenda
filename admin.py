@@ -37,7 +37,7 @@ class ElectionAuthorityAdmin(admin.ModelAdmin):
 admin.site.register(ElectionAuthority, ElectionAuthorityAdmin)
 
 class SealedVoteAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'poll',)
-    list_filter = ('poll',)
+    list_display = ('user_id', 'race',)
+    list_filter = ('race',)
     list_select_related = True
 admin.site.register(SealedVote, SealedVoteAdmin)
