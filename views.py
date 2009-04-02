@@ -5,13 +5,15 @@ from referenda.models import *
 from django.utils import simplejson as json
 from referenda.forms import *
 
-def vote_test (request, slug):
+def preview (request, slug):
+
     try:
         election = Election.objects.get(slug=slug)
     except Election.DoesNotExist:
         raise Http404
     else:
-        return render_to_response('referenda/vote_test.html',
+        page_title = '%s (PREVIEW BALLOT)' % election
+        return render_to_response('referenda/preview.html',
                                   locals(),
                                   context_instance=RequestContext(request))
 

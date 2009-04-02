@@ -10,7 +10,7 @@ html
 #js-warning
 {
     border: 2px #ff0000 solid;
-    background: #ffe0e0;
+    background: url("../img/stripe_error.png");
 }
 
 #frame
@@ -59,6 +59,12 @@ html
 {
     background: #c1c8d0;
     border-left: 20px #1a1a1a solid;
+}
+
+#notification li
+{
+    border: 2px #fffc00 solid;
+    background: url("../img/stripe_warning.png");
 }
 
 

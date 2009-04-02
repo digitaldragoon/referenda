@@ -61,6 +61,11 @@ a.button.submitballot
     width: 118px;
     background-image: url("../img/button_submitballot.png");
 }
+a.button.previewballot
+{
+    width: 110px;
+    background-image: url("../img/button_previewballot.png");
+}
 a.button.castvote
 {
     background-image: url("../img/button_castvote.png");

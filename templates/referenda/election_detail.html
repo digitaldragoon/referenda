@@ -32,6 +32,7 @@
         <dd>This election does not currently have any election authorities.</dd>
         {% endif %}
     </dl>
+    <a class="button previewballot" href="{% url referenda.ballot_preview object.slug %}">Preview Ballot</a>
 </div>
 
 {% endblock %}

@@ -20,6 +20,9 @@
         <noscript><div id="js-warning">
                 <p>WARNING: Referenda has detected that you have JavaScript disabled. You will not be able to vote unless you re-enable it.</p>
         </div></noscript>
+        <div id="notification">
+        {% block notification %}{% endblock %}
+        </div>
         <div id="content-pane">
             <div id="inner-frame">
                 {% block innerframe %}
