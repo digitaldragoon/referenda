@@ -1,6 +1,9 @@
 from django.contrib import admin
 from referenda.models import *
 
+class BallotCandidateAdminInline(admin.TabularInline):
+    model = BallotCandidate
+
 class ElectionAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name',)}
 admin.site.register(Election, ElectionAdmin)
@@ -10,6 +13,7 @@ class RaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'election', 'rank',)
     list_filter = ('election',)
     list_select_related = True
+    inlines = [ BallotCandidateAdminInline, ]
 admin.site.register(Race, RaceAdmin)
 
 try:
