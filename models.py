@@ -183,6 +183,14 @@ class Election (Poll):
     """
     Election with heavy encryption and all sorts of other security features.
     """
+
+    ORDER_CHOICES = (
+            ('random', 'Random'),
+            ('alphabetical', 'Alphabetical'),
+            ('default', 'As added'),
+        )
+
+    order = models.CharField(max_length=50, choices=ORDER_CHOICES)
     authentication = models.CharField(max_length=200, choices=utils.get_auth_choices())
     objects = PollManager()
 
@@ -274,6 +282,13 @@ class Election (Poll):
         return self.is_current and self.active and self.valid 
     is_submissible = property(_get_is_submissible)
 
+    def has_voted(self, user_id):
+        for race in self.races.all():
+            if race.sealedvotes.filter(user_id=user_id).count() > 0:
+                return True
+
+        return False
+
 class ElectionAuthority (models.Model):
     """
     An administrator who acts as a validator and tabulator of an Election, but cannot set the parameters of an Election.
@@ -351,44 +366,24 @@ class CandidateManager (models.Manager):
     def random(self):
         return self.order_by('?')
 
+    def alphabetical(self):
+        return self.order_by('last_name', 'first_name')
+
+    def default(self):
+        return self.order_by('pk')
+
 class Candidate (models.Model):
     """
-    The superclass for candidates in Races.
-    """
-    race = models.ForeignKey(Race, related_name="candidates")
-
-    objects = CandidateManager()
-
-    template = 'referenda/ballotcandidate.html'
-
-    _child_type = models.CharField(max_length=30, editable=False)
-    def _get_child(self):
-        """
-        Automatically handles link to child implementing class.
-        """
-        try:
-            return getattr(self, self._child_type.lower())
-        except:
-            raise AttributeError('unknown child type %s for Candidate %s' % (self._child_type, self.__unicode__()))
-    child = property(_get_child)
-
-    def __unicode__(self):
-        return self.pk
-
-    def save(self):
-        self._child_type = self.__class__.__name__
-        super(Candidate, self).save()
-
-    class Meta:
-        ordering = ['race',]
-
-class BallotCandidate (Candidate):
-    """
-    A Candidate which has a formal place on the ballot.
+    A candidate with a formal place on a ballot.
     """
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     bio = models.CharField(max_length=1000, blank=True)
+    race = models.ForeignKey(Race, related_name="candidates")
+
+    objects = CandidateManager()
+
+    template = 'referenda/candidate.html'
 
     def _get_full_name(self):
         return "%s %s" % (self.first_name, self.last_name)
@@ -397,14 +392,17 @@ class BallotCandidate (Candidate):
     def __unicode__(self):
         return self.full_name
 
+    def save(self):
+        self._child_type = self.__class__.__name__
+        super(Candidate, self).save()
+
     class Meta:
-        verbose_name = 'Ballot Candidate'
         ordering = ['race', 'last_name', 'first_name']
 
 try:
     from photologue import models as photologue
-    class BallotCandidatePhoto (photologue.ImageModel):
-        candidate = models.OneToOneField(BallotCandidate, related_name='photo')
+    class CandidatePhoto (photologue.ImageModel):
+        candidate = models.OneToOneField(Candidate, related_name='photo')
 except ImportError:
     pass
 
@@ -429,7 +427,7 @@ class SealedVote (models.Model):
             raise PermissionDenied, 'election is not currently accepting votes.'
 
     class Meta:
-        unique_together = ('user_id', 'poll')
+        unique_together = ('user_id', 'race')
     
 class Ballot (unicode):
     """
@@ -443,6 +441,19 @@ class Ballot (unicode):
         #FIXME
         raise NotImplementedError, "not yet implemented"
     hash = property(_compute_hash)
+
+    def block(self):
+        """
+        Outputs the ballot as a block of text with line breaks suitable for rendering out to a page.
+        """
+        line_length = 50
+        sets = int(len(self)/line_length)
+        blockstring = ''
+        for i in range(sets):
+            blockstring += self[line_length*i:line_length*(i+1)] + '<br/>'
+        blockstring += self[line_length*sets:]
+
+        return blockstring
 
     class Meta:
         abstract = True

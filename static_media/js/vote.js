@@ -1,5 +1,4 @@
-/* an object with some methods for handling modal dialogs */
-var dialog = {
+/* an object with some methods for handling modal dialogs */ var dialog = {
     close: function(dialog) {
                 dialog.container.fadeOut(300, function() {
                             dialog.overlay.slideUp(300, function() {
@@ -41,8 +40,21 @@ Session.prototype.get_credentials = function() {
     this.user_id = $('#login_user_id').val();
     this.password = $('#login_password').val();
 }
-Session.prototype.keygen = function() {
-    $('#enc_public_key').val('none');
+/* This function taken from Ben Adida's work in Helios */
+Session.prototype.generate_keypair = function() {
+    BigInt.setup();
+    /* ELGAMAL_JSON_PARAMS is written out to the voter_login.html file before this file is loaded */
+    ELGAMAL_PARAMS = ElGamal.Params.fromJSONObject(ELGAMAL_JSON_PARAMS);
+
+    try {
+        SECRET_KEY = ELGAMAL_PARAMS.generate();
+    } catch (e) {
+        alert(e);
+    }
+
+
+    $('#enc_public_key').val($.toJSON(SECRET_KEY.pk));
+    $('#enc_secret_key').val($.toJSON(SECRET_KEY));
 }
 
 function Controller() {
@@ -101,7 +113,7 @@ Controller.prototype.login = function() {
                 }
             },
             error: function (data) {
-                control.display_message('The server encountered an error while aattempting to log you in. Please try again in a few moments. If the problem persists, <a href="..">contact the administrator</a>.');
+                control.display_message('The server encountered an error while attempting to log you in. Please try again in a few moments. If the problem persists, <a href="..">contact the administrator</a>.');
                 $('#login_frame .wait').remove();
 
             }
@@ -161,9 +173,12 @@ Controller.prototype.configure = function () {
             });
 
     var notice = document.createElement('p');
-    $(notice).attr('id', 'crypto-notice').addClass('wait').text('Please wait while we generate your cryptography keys...').oneTime('3s', 'keygen', function() { $(this).removeClass('wait').append('done!').after(cont);});
-    this.session.keygen();
+    $(notice).attr('id', 'crypto-notice').addClass('wait').text('Please wait while we generate your cryptography keys...');
     $('#panel_setup').append(notice);
+
+    this.session.generate_keypair();
+        
+    $(notice).removeClass('wait').append('done!').after(cont);
 }
 
 /* Navigate to a particular panel */
@@ -337,7 +352,7 @@ Controller.prototype.update_finalize = function() {
     var control = this;
 
     var ballot_text = $('#enc_plaintext_ballot').val();
-    var ballot = $.parseJSON(ballot_text, true);
+    var ballot = $.secureEvalJSON(ballot_text, true);
 
     var ol = document.createElement('ul');
     for (key in ballot) {

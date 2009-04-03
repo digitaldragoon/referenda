@@ -12,7 +12,7 @@
     {% if object.races.all %}
     <ul>
         {% for race in object.races.all %}
-        <li>{{ race.name }}</li>
+        <li>{{ race.name }} <span class="link">(<a href="{% url referenda.race_detail race.election.slug race.slug %}">detail&nbsp;&#187;</a>)</span></li>
         {% endfor %}
     </ul>
     {% endif %}

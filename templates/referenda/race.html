@@ -3,7 +3,7 @@
 <ul>
     {% if race.candidates.all %}
     {% for candidate in race.candidates.random %}
-    {% include candidate.child.template %}
+    {% include "referenda/candidate.html" %}
     {% endfor %}
     {% endif %}
     {% for num in race.num_choices_iter %}

@@ -3,6 +3,11 @@
     font-family: "verdana", sans-serif;
 }
 
+pre
+{
+    font-family: monospace;
+}
+
 h1, h2, h3, 
 h1 *, h2 *, h3 *, 
 h1 a, h2 a, h3 a,
@@ -65,7 +70,8 @@ dt
     font-size: 14px;
 }
 dt .link,
-dd .link
+dd .link,
+span.link
 {
     font-size: 9px;
     vertical-align: middle;

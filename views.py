@@ -4,11 +4,12 @@ from django.http import HttpResponse, HttpResponseNotAllowed, Http404
 from referenda.models import *
 from django.utils import simplejson as json
 from referenda.forms import *
+from referenda.crypto import utils as cryptoutils
 
-def preview (request, slug):
+def preview (request, election_slug):
 
     try:
-        election = Election.objects.get(slug=slug)
+        election = Election.objects.get(slug=election_slug)
     except Election.DoesNotExist:
         raise Http404
     else:
@@ -17,9 +18,9 @@ def preview (request, slug):
                                   locals(),
                                   context_instance=RequestContext(request))
 
-def ballot_content (request, slug):
+def ballot_content (request, election_slug):
     try:
-        election = Election.objects.get(slug=slug)
+        election = Election.objects.get(slug=election_slug)
     except Election.DoesNotExist:
         raise Http404
     else:
@@ -27,16 +28,16 @@ def ballot_content (request, slug):
                                   locals(),
                                   context_instance=RequestContext(request))
 
-def voter_login (request, slug):
+def voter_login (request, election_slug):
     from referenda.auth.standard import *
-    election = Election.objects.get(slug=slug)
+    election = Election.objects.get(slug=election_slug)
 
     if not election.is_submissible:
         raise Http404
 
     # authenticate user and return data to client
     if request.method == 'POST':
-        if election.sealedvotes.filter(user_id=request.POST['user_id']).count() == 0:
+        if not election.has_voted(request.POST['user_id']):
             try:
                 credentials = election.authenticator.authenticate(request.POST['user_id'], request.POST['password'])
             except InvalidCredentials:
@@ -63,14 +64,15 @@ def voter_login (request, slug):
 
     # display login front-end
     else:
+        elgamal_json_params = json.dumps(cryptoutils.ELGAMAL_PARAMS.toJSONDict(), sort_keys=True)
         return render_to_response('referenda/voter_login.html', 
                               locals(),
                               context_instance=RequestContext(request))
 
-def submit_ballot (request, slug):
+def submit_ballot (request, election_slug):
     if request.method == 'POST':
         try:
-            election = Election.objects.get(slug=slug)
+            election = Election.objects.get(slug=election_slug)
         except Election.DoesNotExist:
             raise Http404
         else:
