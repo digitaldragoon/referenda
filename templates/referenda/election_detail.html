@@ -16,7 +16,7 @@
         {% endfor %}
     </ul>
     {% endif %}
-    {% if object.is_submissible %}<a class="button votenow" href="{% url referenda.voter_login object.slug %}">Vote Now!</a>{% endif %}
+    {% if object.is_submissible %}<a class="button votenow" href="{% url referenda.booth object.slug %}">Vote Now!</a>{% endif %}
 </div>
 <div class="column short">
     <h1>Administrators</h1>

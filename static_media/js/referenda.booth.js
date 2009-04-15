@@ -23,8 +23,25 @@ REFERENDA.BOOTH.Ballot = Class.extend({
     }
 });
 
+/*
+ * Holds the session state.
+ */
+REFERENDA.BOOTH.Session = Class.extend({
+    fromJSON: function(jsonString) {
+        //FIXME
+    },
+});
+
 /* The object which controls the voting booth (navigation, data gathering, etc.) */
 REFERENDA.BOOTH.Controller = Class.extend({
+    init: function(element) {
+        this._element = element;
+        this.TEMPLATES = {};
+
+        // setup templats
+        this.createTemplate('LOGIN_FRAME', 'templates/login_frame/');
+    },
+
     /* Activates the nav links on the progress panel. */
     activate_nav_links: function() {
         control = this;
@@ -58,7 +75,6 @@ REFERENDA.BOOTH.Controller = Class.extend({
                     }
                 });
     
-        $('li.candidate .info input').keyup(function() {
     },
 
     /* Activate the "Cast Vote" buttons, which runs a check to see if the user has used up all of their votes, and then navigates to the next panel. */
@@ -82,5 +98,44 @@ REFERENDA.BOOTH.Controller = Class.extend({
                 control.navigate_to_next_panel();
             }
         });
+    },
+
+    createTemplate: function(name, template_path) {
+        this.TEMPLATES[name] = $('<div></div>');
+        this.TEMPLATES[name].setTemplateURL(template_path);
+        this.TEMPLATES[name].getContents = function() {
+                    return $(this.html());
+                };
+    },
+
+    displayLogin: function() {
+        // display templates
+        this.TEMPLATES.LOGIN_FRAME.processTemplate();
+        var contents = this.TEMPLATES.LOGIN_FRAME.getContents();
+
+        // make the login fields submit on enter keypresses
+        contents.find('#login_user_id').add(contents.find('#login_password')).keypress(function(e) {
+                    if (e.which == 13) {
+                        contents.find('#login_submit').click();
+                    }
+                });
+
+        // watermark fields
+        contents.find('#login_user_id').watermark('username');
+        contents.find('#login_password').watermark('password');
+
+        $(this._element).append(contents);
+
+        contents.find('#login_user_id').focus();
     }
 });
+
+/* 
+ * Initializes the voting booth and assigns it an element to use for its
+ * presentation
+ */
+REFERENDA.BOOTH.setup = function(element) {
+    //FIXME sets up as REFERENDA.BOOTH.CONTROL
+    REFERENDA.BOOTH.CONTROL = new REFERENDA.BOOTH.Controller(element);
+    REFERENDA.BOOTH.CONTROL.displayLogin();
+};

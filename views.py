@@ -1,8 +1,8 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseNotAllowed, Http404
-from referenda.models import *
 from django.utils import simplejson as json
+from referenda.models import *
 from referenda.forms import *
 from referenda.crypto import utils as cryptoutils
 
@@ -19,17 +19,7 @@ def preview (request, election_slug):
                                   locals(),
                                   context_instance=RequestContext(request))
 
-def ballot_content (request, election_slug):
-    try:
-        election = Election.objects.get(slug=election_slug)
-    except Election.DoesNotExist:
-        raise Http404
-    else:
-        return render_to_response('referenda/ballot_content.html',
-                                  locals(),
-                                  context_instance=RequestContext(request))
-
-def voter_login (request, election_slug):
+def booth (request, election_slug):
     from referenda.auth.standard import *
     election = Election.objects.get(slug=election_slug)
 
@@ -66,9 +56,17 @@ def voter_login (request, election_slug):
     # display login front-end
     else:
         elgamal_json_params = json.dumps(cryptoutils.ELGAMAL_PARAMS.toJSONDict(), sort_keys=True)
-        return render_to_response('referenda/voter_login.html', 
+        return render_to_response('referenda/booth.html', 
                               locals(),
                               context_instance=RequestContext(request))
+
+def javascript_template (request, election_slug, template_name):
+    try:
+        election = Election.objects.get(slug=election_slug)
+    except Election.DoesNotExist:
+        raise Http404
+    else:
+        return render_to_response('referenda/js/%s.html' % template_name, locals());
 
 def submit_ballot (request, election_slug):
     if request.method == 'POST':
