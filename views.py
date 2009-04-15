@@ -13,6 +13,7 @@ def preview (request, election_slug):
     except Election.DoesNotExist:
         raise Http404
     else:
+        elgamal_json_params = '{}'
         page_title = '%s (PREVIEW BALLOT)' % election
         return render_to_response('referenda/preview.html',
                                   locals(),
