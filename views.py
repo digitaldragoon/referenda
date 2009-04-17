@@ -165,3 +165,20 @@ def home (request):
     return render_to_response('referenda/home.html', 
                               locals(),
                               context_instance=RequestContext(request))
+
+def bulletinboard (request, race_slug):
+    try:
+        race = Race.objects.get(slug=race_slug)
+    except Race.DoesNotExist:
+        raise Http404
+    else:
+        ballots = race.sealedvotes.all()
+        ballot_list = []
+
+        for ballot in ballots:
+            ballot_list.append((ballot.user_id,ballot.ballot,))
+
+        output = json.dumps(ballot_list)
+        return render_to_response('referenda/bulletinboard.html',
+                              locals(),
+                              context_instance=RequestContext(request))
