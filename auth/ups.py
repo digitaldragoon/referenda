@@ -110,5 +110,15 @@ class UpsStudentAuth (UpsGeneralAuth):
         return groups + super(UpsStudentAuth, self)._get_groups(con, user_id)
 
 class UpsFacultyAuth (UpsGeneralAuth):
-    necessary_groups = ['Faculty']
     message = 'You must be a UPS faculty member to vote.'
+
+    def authenticate(self, user_id, password):
+        file = open(os.path.dirname(__file__) + '/faculty_list_2009', "rb")
+
+        for line in file:
+            id = line.strip('\n')
+            
+            if user_id == id:
+                return super(UpsFacultyAuth, self).authenticate(user_id, password)
+
+        raise Unauthorized
