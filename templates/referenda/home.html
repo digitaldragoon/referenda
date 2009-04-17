@@ -3,7 +3,7 @@
 {% block main %}
 <div class="column long">
     <h1>Welcome</h1>
-    <p>Welcome to Referenda, the open-source, open-audit voting system (<a href="#">what does that mean?</a>). Referenda puts the power back in your hands. Look below to find an election to vote in.</p>
+    <p>Welcome to Referenda, the open-source, open-audit voting system (<a href="{% url referenda.about %}">what does that mean?</a>). Referenda puts the power back in your hands. Look below to find an election to vote in.</p>
     <h2>Current Elections</h2>
     {% if current_elections %}
     <ul>

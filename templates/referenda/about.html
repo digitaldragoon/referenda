@@ -1,0 +1,13 @@
+{% extends "referenda/base.html" %}
+
+{% block title %}About Referenda{% endblock %}
+
+{% block main %}
+<h1>About Referenda</h1>
+<h2>Overview</h2>
+<p>Referenda is an open-source, open-audit voting system. It is based on the work of <a href="http://benadida.com/">Ben Adida</a>, who developed the <a href="http://heliosvoting.org">Helios voting system</a>. Referenda was developed by Stefan Moluf as an extension of Helios, indented to enhance the voter's user experience and maintain the integrity of the Helios open-audit model.</p>
+<h2>Open source</h2>
+<p>Referenda is free software distributed under the <a href="{% url referenda.license %}">GNU General Public License v3</a>. This serves two purposes. First, it guarantees that voters have the ability to audit Referenda's source code and confirm that the program operates as advertised. Second, it allows anyone to make improvements to the software as they see fit.</p>
+<h2>Open audit</h2>
+<p>Referenda capitalizes on the work done on Helios to allow voters to audit the entire election process. By using cryptographic techniques and mathematical proofs, it enables both voter privacy and open auditing so that all parties can prove to their satisfaction that the election was carried out fairly and correctly.</p>
+{% endblock %}

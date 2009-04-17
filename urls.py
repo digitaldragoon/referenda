@@ -5,6 +5,7 @@ from referenda.models import *
 
 urlpatterns = patterns('',
     url(r'^$', 'referenda.views.home', name='referenda.home'),
+    url(r'^about/$', direct_to_template, {'template': 'referenda/about.html'}, name='referenda.about'),
     url(r'^license/$', direct_to_template, {'template': 'referenda/license.html'}, name='referenda.license'),
     url(r'^election/(?P<election_slug>[-_a-z0-9]+)/preview/$', 'referenda.views.preview', name='referenda.ballot_preview'),
     url(r'^election/(?P<slug>[-_a-z0-9]+)/$', object_detail, {'queryset': Election.objects.all(),'template_name': 'referenda/election_detail.html'}, name='referenda.election_detail'),
