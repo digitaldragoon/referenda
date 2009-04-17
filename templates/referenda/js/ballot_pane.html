@@ -1,21 +1,3 @@
-<div id="advanced-panel" style="right: -760px">
-    <a class="button advanced">Advanced</a>
-    <h1>Advanced Control Panel</h1>
-    <p>This control panel gives you access to everything that's going on "under the hood" in Referenda. <strong>WARNING: IF YOU DON'T KNOW WHAT YOU'RE DOING, YOU CAN VERY EASILY RUIN YOUR VOTE.</strong></p>
-    <p>If you don't know what ElGamal encryption and public-key cryptography are, you should leave this panel alone.</p>
-    <p><a class="checkbox" id="advanced-panel-gate">Enable advanced options</a></p>
-    <div id="advanced-panel-controls" style="visibility: hidden;">
-        <div class="advanced-control left">
-            <label>ElGamal public key</label><br />
-            <textarea id="enc_public_key" rows="8" cols="45"></textarea>
-        </div>
-        <div class="advanced-control right">
-            <label>ElGamal secret key</label><br />
-            <textarea id="enc_secret_key" rows="8" cols="45"></textarea>
-        </div>
-        <div class="clear"></div>
-    </div>
-</div>
 <div class="cap top"></div>
 <div id="main">
     <div class="column long">
@@ -27,9 +9,7 @@
                 <ol>
                     <li><p><strong>DO NOT PRESS THE "BACK" BUTTON OR REFRESH THE PAGE. YOU WILL HAVE TO START OVER</strong>. You have been warned.</p></li>
                     <li><p>Most links have been disabled to prevent you from accidentally leaving your voting session.</p></li>
-                    <li><p>If you're a security-conscious user, you can take a look at the "advanced" tab on the right.</p></li>
                 </ol>
-                <p>A "continue" button will appear below when everything's ready. Be patient! Cryptography can take a minute or two.</p>
             </div>
             {% for race in election.races.all %}
             <div id="panel_{{ race.slug }}" class="race" style="display: none;">

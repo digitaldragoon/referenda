@@ -108,19 +108,6 @@ REFERENDA.BOOTH.Session = Class.extend({
         this.election = new REFERENDA.Election(data['election']);
     },
 
-    generateKeypair: function() {
-        var elgamalParams = ElGamal.Params.fromJSONObject(REFERENDA_ELGAMAL_JSON_PARAMS);
-
-        try {
-            var secretKey = elgamalParams.generate();
-        } catch (e) {
-            REFERENDA.BOOTH.CONTROL.displayMessage(e);
-        }
-
-        $(REFERENDA.BOOTH.CONTROL.container).find('#enc_public_key').val($.toJSON(secretKey.pk));
-        $(REFERENDA.BOOTH.CONTROL.container).find('#enc_secret_key').val($.toJSON(secretKey));
-    },
-
     getRace: function(raceSlug) {
         return this.election.raceMap[raceSlug];
     },
@@ -140,74 +127,6 @@ REFERENDA.BOOTH.Controller = Class.extend({
         this.createTemplate('MESSAGE_CONFIRM', 'templates/message_confirm/');
         this.createTemplate('BALLOT_PANE', 'templates/ballot_pane/');
         this.createTemplate('SUBMISSION_PANE', 'templates/submission_pane/');
-    },
-
-    /* Activates advanced panel */
-    activateAdvancedPanel: function() {
-        var panel = $(this.container).find('#advanced-panel');
-        panel.data('state', 'closed');
-
-        /* fix IE */
-        if (jQuery.browser.msie) {
-            panel.css('right', '-800px');
-        }
-
-        /* Create animation functions */
-        panel.open = function(instant) {
-            if (jQuery.browser.msie) { var rightVal = '760px'; }
-            else { var rightVal = '0px';}
-
-            if (instant) {
-                panel.css('right', rightVal);
-            }
-            else
-            {
-                panel.animate({
-                        right: rightVal
-                        }, 'normal');
-            }
-            panel.data('state', 'open');
-        }
-
-        panel.close = function(instant) {
-            if(jQuery.browser.msie) { var rightVal = '0px'; }
-            else { var rightVal = '-760px';}
-
-            if (instant) {
-                panel.css('right', rightVal);
-            }
-            else {
-                panel.animate({
-                        right: rightVal
-                    }, 'normal');
-            }
-            panel.data('state', 'closed');
-        }
-
-        /* Set slide animation */
-        panel.find('.button').click(function() {
-            if (panel.data('state') == 'closed')
-            {
-                panel.open(false);
-            }
-            else
-            {
-                panel.close(false);
-            }
-        });
-
-        /* Reveal advanced controls */
-        panel.find('#advanced-panel-gate').click(function() {
-                    if ($(this).hasClass('checked')) {
-                        $(this).removeClass('checked');
-                        panel.find('#advanced-panel-controls').css('visibility', 'hidden');
-                    }
-                    else {
-                        $(this).addClass('checked');
-                        panel.find('#advanced-panel-controls').css('visibility', 'visible');
-
-                    }
-                });
     },
 
     /* Activates the nav links on the progress panel. */
@@ -408,7 +327,6 @@ REFERENDA.BOOTH.Controller = Class.extend({
         this.activateNavLinks();
         this.activateCandidateSelection();
         this.activateCastVoteButtons();
-        this.activateAdvancedPanel();
         this.activateSubmissionButton();
     },
 
@@ -452,6 +370,10 @@ REFERENDA.BOOTH.Controller = Class.extend({
         $(this.container).html(contents);
 
         contents.find('#login_user_id').focus();
+    },
+
+    disableLinks: function() {
+        $('#header a').add('#footer a').each( function() { $(this).click(function(e) { e.preventDefault(); REFERENDA.BOOTH.CONTROL.displayMessage('Link disabled while voting!'); }); });
     },
 
     /* Bring up a modal confirmation dialog */
@@ -501,18 +423,12 @@ REFERENDA.BOOTH.Controller = Class.extend({
 
         $(this.container).html(pane);
 
-        /* generate ElGamal keypair */
-        var notice = this.createWaitMessage('Please wait while we generate your cryptographic keys...');
-        $(this.container).find('#panel_setup').append(notice);
-
-        REFERENDA.BOOTH.SESSION.generateKeypair();
-
-        notice.done('done!');
         var continueButton = $('<a class="button continue">Continue</a>');
         $(continueButton).click(function() { REFERENDA.BOOTH.CONTROL.activateControls(); REFERENDA.BOOTH.CONTROL.navigateToPanel(REFERENDA.BOOTH.SESSION.election.eligibleRaces[0]); });
-        notice.after(continueButton);
+        $(this.container).find('#panel_setup').append(continueButton);
 
         REFERENDA.BOOTH.CONTROL.updateBallot();
+        this.disableLinks();
     },
 
     /* The grand login function - authenticate and load in ballot pane */
