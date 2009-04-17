@@ -97,7 +97,6 @@ class Poll (models.Model):
     poll_closes = models.DateTimeField(default=datetime.now()+timedelta(days=14))
     active = models.BooleanField(help_text="Should this poll open? (disable to make changes before re-opening poll)", default=True)
     inactive_notice = models.TextField(help_text="Message to display when the polls have opened but the poll has been marked as inactive. Use this to announce period of maintenance or repair.", blank=True)
-    ballot = BallotField(blank=True)
     administrator = models.ForeignKey(User)
 
     objects = PollManager()
