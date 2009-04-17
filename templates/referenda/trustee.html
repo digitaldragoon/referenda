@@ -1,0 +1,28 @@
+{% extends "referenda/base.html" %}
+
+{% block script %}
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/jquery/jquery.timers-1.1.2.js"></script>
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/jquery/jquery-jtemplates.js"></script>
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/jquery/jquery.watermark.js"></script>
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/referenda.js"></script>
+<script type="text/javascript" src="{{ REFERENDA_MEDIA_PREFIX}}/js/referenda.trustee.js"></script>
+{% endblock %}
+
+{% block applet %}
+<div style="overflow: hidden; height:0">
+    <applet name="bigint" width="1" height="1" code="bigint.class" codebase="{{ REFERENDA_MEDIA_PREFIX }}/js/crypto/"></applet>
+</div>
+{% endblock %}
+
+{% block main %}
+<h1>Administration - {{ election.name }}</h1>
+<script type="text/javascript">
+    <!--
+    document.write('\<p class="wait"\>Please wait...\<\/p\>');
+    //-->
+</script>
+<noscript><div class="center invalid">
+    <h3>JavaScript disabled.</h3>
+    <p>Please enable JavaScript to administer this election.</p>
+</div></noscript>
+{% endblock %}

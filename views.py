@@ -21,6 +21,16 @@ def preview (request, election_slug):
                                   locals(),
                                   context_instance=RequestContext(request))
 
+def trustee (request, election_slug):
+    try:
+        election = Election.objects.get(slug=election_slug)
+    except Election.DoesNotExist:
+        raise Http404
+    else:
+        return render_to_response('referenda/trustee.html',
+                                  locals(),
+                                  context_instance=RequestContext(request))
+
 def booth (request, election_slug):
     from referenda.auth.standard import *
     election = Election.objects.get(slug=election_slug)

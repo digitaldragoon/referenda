@@ -23,7 +23,7 @@
     <dl>
         <dt>Adminstrator <span class="link">(<a href="#">login&nbsp;&#187;</a>)</span></dt>
         <dd>{{ object.administrator.first_name }} {{ object.administrator.last_name }} <span class="link">(<a href="mailto:{{ object.administrator.email }}">contact</a>)</span></dd>
-        <dt>Election Authorities <span class="link">(<a href="#">login&nbsp;&#187;</a>)</span></dt>
+        <dt>Election Authorities <span class="link">(<a href="{% url referenda.trustee object.slug %}">login&nbsp;&#187;</a>)</span></dt>
         {% if object.authorities %}
         {% for authority in object.authorities.all %}
         <dd>{{ authority.user.first_name }} {{ authority.user.last_name }} <span class="link">(<a href="mailto:{{ authority.user.email }}">contact</a>)</span></dd>

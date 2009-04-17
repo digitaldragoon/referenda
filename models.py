@@ -332,6 +332,9 @@ class Race (models.Model):
     def num_choices_iter(self):
         return range(self.num_choices)
 
+    def ordered_candidates(self):
+        return getattr(self.candidates, self.election.order)()
+
     class Meta:
         ordering = ['election', '-rank', 'name']
         unique_together = ('slug', 'election',)

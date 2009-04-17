@@ -2,7 +2,7 @@
 <p>Make up to {{ race.num_choices}} choice{{ race.num_choices|pluralize }}.</p>
 <ul>
     {% if race.candidates.all %}
-    {% for candidate in race.candidates.random %}
+    {% for candidate in race.ordered_candidates %}
     {% include "referenda/candidate.html" %}
     {% endfor %}
     {% endif %}
