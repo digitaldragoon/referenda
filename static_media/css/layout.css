@@ -209,7 +209,8 @@ div.advanced-control.right
 {
     float: right;
 }
-div.advanced-control textarea
+div.advanced-control textarea,
+#submission-pane textarea
 {
     font-size: 9px;
 }

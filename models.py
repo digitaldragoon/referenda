@@ -3,8 +3,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.template import RequestContext
-from django.core import serializers
 from django.core.exceptions import *
+from django.core import serializers
+from django.utils import simplejson as json
 from referenda import utils
 
 ################################################################################
@@ -192,6 +193,8 @@ class Election (Poll):
 
     order = models.CharField(max_length=50, choices=ORDER_CHOICES)
     authentication = models.CharField(max_length=200, choices=utils.get_auth_choices())
+    public_key = models.TextField(blank=True)
+
     objects = PollManager()
 
     def _get_authenticator(self):
@@ -216,23 +219,9 @@ class Election (Poll):
         raise NotImplementedError, "not yet implemented"
     hash = property(_compute_hash)
 
-    def _check_approval(self):
+    def _check_validity(self):
         """
-        Check whether this election has been approved by all of its election authorities.
-        """
-        if self.authorities.count() <= 0:
-            return False
-        else:
-            is_approved = True
-            for authority in self.authorities.all():
-                is_approved = authority.approved and is_approved
-    
-            return is_approved
-    approved = property(_check_approval)
-
-    def _check_signatures(self):
-        """
-        Check whether all election authorities have signed the empty ballot.
+        Check whether all election authorities have signed the empty ballot, and ensures that one of the election authorities is listed as possesing this election's public key.
         """
         #FIXME
         return True
@@ -249,18 +238,11 @@ class Election (Poll):
                 is_signed = authority.has_valid_signature and is_signed
 
             return is_signed
-    signed = property(_check_signatures)
-
-    def _check_validity(self):
-        """
-        Determines whether this Election is valid - that is, whether its ElectionAuthorities have approved and properly signed it. Only valid elections may have ballots cast in them.
-        """
-        return self.approved and self.signed
     valid = property(_check_validity)
 
     def get_races_for (self, groups):
         """
-        Given a list of groups, returns a list of races which have any one of those groups in their 'groups' field, or which have no groups in thier 'groups' field.
+        Given a list of groups, returns a QuerySet of races which have any one of those groups in their 'groups' field, or which have no groups in thier 'groups' field.
         """
         final_races = []
         for race in self.races.all():
@@ -276,11 +258,21 @@ class Election (Poll):
             if valid_race:
                 final_races.append(race.pk)
 
-        return serializers.serialize('python', self.races.filter(pk__in=final_races), fields=('name', 'slug', 'num_choices'))
+        return self.races.filter(pk__in=final_races)
 
     def _get_is_submissible (self):
         return self.is_current and self.active and self.valid 
     is_submissible = property(_get_is_submissible)
+
+    def _get_parameters (self):
+        parameters = {}
+
+        parameters['races'] = serializers.serialize('python', election.races.all(), fields=('name', 'slug', 'num_choices'))
+        parameters['pk'] = self.public_key
+
+        return json.dumps(parameters)
+
+    parameters = property(_get_parameters)
 
     def has_voted(self, user_id):
         for race in self.races.all():
@@ -297,8 +289,6 @@ class ElectionAuthority (models.Model):
     election = models.ForeignKey(Election, related_name="authorities")
     public_key = models.TextField(blank=True)
     election_signature = models.TextField(blank=True)
-    ballot_signature = models.TextField(blank=True)
-    approved = models.BooleanField(default=False)
 
     def _verify_signature(self):
         """
@@ -343,7 +333,7 @@ class Race (models.Model):
         return range(self.num_choices)
 
     class Meta:
-        ordering = ['election', 'name']
+        ordering = ['election', '-rank', 'name']
         unique_together = ('slug', 'election',)
 
 class Referendum (models.Model):
@@ -411,10 +401,8 @@ class SealedVote (models.Model):
     A finished vote uploaded by a voter.
     """
     user_id = models.CharField(max_length=100)
-    public_key = models.TextField()
     race = models.ForeignKey(Race, related_name='sealedvotes')
     ballot = BallotField()
-    signature = models.TextField()
     timestamp = models.DateTimeField(auto_now=True, editable=False)
 
     def __unicode__(self):

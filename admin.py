@@ -31,7 +31,7 @@ class CandidateAdmin(admin.ModelAdmin):
 admin.site.register(Candidate, CandidateAdmin)
 
 class ElectionAuthorityAdmin(admin.ModelAdmin):
-    list_display = ('user', 'election', 'approved',)
+    list_display = ('user', 'election',)
     list_filter = ('election',)
     list_select_related = True
 admin.site.register(ElectionAuthority, ElectionAuthorityAdmin)

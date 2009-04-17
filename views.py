@@ -1,6 +1,8 @@
+from django.db import transaction
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseNotAllowed, Http404
+from django.core import serializers
 from django.utils import simplejson as json
 from referenda.models import *
 from referenda.forms import *
@@ -43,10 +45,15 @@ def booth (request, election_slug):
                     data = {'status': 'invalid',
                             'message': "Your username and password could not be found, or you are not allowed to vote in this election.",}
                 else:
-                    data = {'status': 'success',
-                            'friendly_name': credentials.friendly_name,
-                            'user_id': credentials.user_id,
-                            'races': election.get_races_for(credentials.groups),}
+                    data = {
+                        'status': 'success',
+                        'friendlyName': credentials.friendly_name,
+                        'election': {
+                            'pk': election.public_key,
+                            'races': serializers.serialize('python', election.races.all(), fields=('name', 'slug', 'num_choices')),
+                            'eligibleRaces': serializers.serialize('python', election.get_races_for(credentials.groups), fields=('slug')),
+                            },
+                        }
         else:
                 data = {'status': 'duplicate',
                         'message': "You have already voted in this election.",}
@@ -66,8 +73,9 @@ def javascript_template (request, election_slug, template_name):
     except Election.DoesNotExist:
         raise Http404
     else:
-        return render_to_response('referenda/js/%s.html' % template_name, locals());
+        return render_to_response('referenda/js/%s.html' % template_name, locals(), context_instance=RequestContext(request));
 
+@transaction.commit_manually
 def submit_ballot (request, election_slug):
     if request.method == 'POST':
         try:
@@ -76,41 +84,63 @@ def submit_ballot (request, election_slug):
             raise Http404
         else:
             if election.is_submissible:
+                credentials = election.authenticator.authenticate(request.POST['user_id'], request.POST['password'])
+                if election.has_voted(request.POST['user_id']):
+                    response = {
+                        'status': 'duplicate',
+                        'message': 'You have already voted in this election.',
+                    }
 
-                form = SealedVoteForm(request.POST)
+                    transaction.rollback()
+                    return HttpResponse(json.dumps(response))
 
-                if form.is_valid():
-                    if election.authenticator.authenticate(form.cleaned_data['user_id'], request.POST['password']) != None:
-                        if election.sealedvotes.filter(user_id=form.cleaned_data['user_id']).count() <= 0:
-                            obj = form.save(commit=False)
-                            obj.poll = election
-                            obj.save()
+                elif credentials != None:
 
-                            response = {
-                                'status': 'success',
-                                'message': 'Your ballot was successfully submitted.',
-                                #FIXME: return when implemented
-                                #'receipt': obj.ballot.hash,
-                            }
-                            return HttpResponse(json.dumps(response))
+                    ballots = json.loads(request.POST['ballot'])
+
+                    # verify this voter is allowed to vote in all races
+                    eligible_races = election.get_races_for(credentials.groups)
+                    eligible_slugs = [x.slug for x in eligible_races]
+
+                    for key in ballots:
+                        data = {
+                            'user_id': request.POST['user_id'],
+                            'race': election.races.get(slug=key).pk,
+                            'ballot': ballots[key],
+                        }
+
+                        form = SealedVoteForm(data)
+
+                        if form.is_valid() and eligible_slugs.count(key) > 0:
+                            form.save()
                         else:
                             response = {
-                                'status': 'duplicate',
-                                'message': 'You have already voted in this election.',
+                                'status': 'invalid',
+                                'message': 'The vote sent to the server was corrupted. Please try submitting again.',
                             }
+
+                            transaction.rollback()
                             return HttpResponse(json.dumps(response))
-                    else:
-                        response = {
-                            'status': 'forbidden',
-                            'message': 'Your username and password did not authenticate successfully.',
-                        }
-                        return HttpResponse(json.dumps(response))
+
+                    # if we made it this far, all the forms check out
+                    response = {
+                        'status': 'success',
+                        'message': 'Your ballot was successfully submitted.',
+                    }
+
+                    transaction.commit()
+                    return HttpResponse(json.dumps(response))
+
                 else:
                     response = {
-                        'status': 'invalid',
-                        'message': 'The vote sent to the server was corrupted. Please try submitting again.',
+                        'status': 'forbidden',
+                        'message': 'Your username and password did not authenticate successfully.',
                     }
-                    return HttpResponse()
+
+                    transaction.rollback()
+                    return HttpResponse(json.dumps(response))
+
+
             else:
                 raise Http404
     else:

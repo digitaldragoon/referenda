@@ -531,3 +531,9 @@ ElGamal.fiatshamir_challenge_generator = function(commitment) {
 ElGamal.fiatshamir_dlog_challenge_generator = function(commitment) {
   return new BigInt(hex_sha1(commitment.toJSONObject()), 16);
 };
+
+ElGamal.encryptString = function(input, pk) {
+    var plaintext = new ElGamal.Plaintext(new BigInt(binb2hex(str2binb(input)), 16), pk, true);
+            
+    return ElGamal.encrypt(pk, plaintext);
+};

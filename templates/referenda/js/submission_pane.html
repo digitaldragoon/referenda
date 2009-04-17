@@ -1,0 +1,14 @@
+<div id="submission-pane">
+    <h1>Submit Your Ballot</h1>
+    <p>Submitting your ballot will complete your vote. Ensure that you've reviewed your ballot before continuting.</p>
+    <div class="message-pane">{$T.message}</div>
+    <p><a class="checkbox" id="submission-pane-inspect-ballot">Inspect your ballot</a></p>
+    <div id="submission-pane-ballot-pane" style="display: none;">
+        <p>WARNING: Don't mess with this unless you're sure you know what you're doing.</p>
+        <label>Ballot</label>
+        <textarea id="submission-pane-ballot" rows="5" cols="50"></textarea>
+        <label>Ciphertext</label>
+        <textarea id="submission-pane-ciphertext" rows="5" cols="50"></textarea>
+    </div>
+    <a class="button submitballot">Submit ballot</a><a class="button cancel simplemodal-close">Cancel</a>
+</div>
