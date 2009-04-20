@@ -110,7 +110,7 @@ REFERENDA.BOOTH.Session = Class.extend({
 
     getRace: function(raceSlug) {
         return this.election.raceMap[raceSlug];
-    },
+    }
 });
 
 /* The object which controls the voting booth (navigation, data gathering, etc.) */

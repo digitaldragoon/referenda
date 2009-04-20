@@ -24,6 +24,11 @@ li.election
     padding-left: 12px;
     background-image: none;
 }
+li.hovered
+{
+    padding: 11px;
+    padding-bottom: 7px;
+}
 
 #js-warning
 {

@@ -1,5 +1,5 @@
 /* The super-namespace */
-REFERENDA = {}
+REFERENDA = {};
 
 /* An object which keeps track of a race */
 REFERENDA.Race = Class.extend({
@@ -7,7 +7,7 @@ REFERENDA.Race = Class.extend({
         this.name = data.fields['name'];
         this.slug = data.fields['slug'];
         this.numChoices = data.fields['num_choices'];
-    },
+    }
 });
 
 /* An object which keeps track of an election */
