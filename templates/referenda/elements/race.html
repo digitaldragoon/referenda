@@ -1,4 +1,6 @@
+{% load markup %}
 <h2>{{ race.name }} (choose {{ race.num_choices }})</h2>
+{{ race.description|textile }}
 <p>Make up to {{ race.num_choices}} choice{{ race.num_choices|pluralize }}.</p>
 <ul>
     {% if race.candidates.all %}

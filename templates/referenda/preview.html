@@ -42,7 +42,7 @@
             </div>
             {% for race in election.races.all %}
             <div id="panel_{{ race.slug }}" class="race" style="display: none;">
-                {% include "referenda/race.html" %}
+                {% include "referenda/elements/race.html" %}
             </div>
             {% endfor %}
         </div>
