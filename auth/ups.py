@@ -118,7 +118,7 @@ class UpsFacultyAuth (UpsGeneralAuth):
         for line in file:
             id = line.strip('\n')
             
-            if user_id == id:
+            if user_id.lower() == id.lower():
                 return super(UpsFacultyAuth, self).authenticate(user_id, password)
 
         raise Unauthorized
