@@ -102,7 +102,7 @@ def submit_ballot (request, election_slug):
                     }
 
                     transaction.rollback()
-                    return HttpResponse(json.dumps(response))
+                    return HttpResponse(json.dumps(response), mimetype='application/json')
 
                 elif credentials != None:
 
@@ -130,7 +130,7 @@ def submit_ballot (request, election_slug):
                             }
 
                             transaction.rollback()
-                            return HttpResponse(json.dumps(response))
+                            return HttpResponse(json.dumps(response), 'application/json')
 
                     # if we made it this far, all the forms check out
                     response = {
@@ -139,7 +139,7 @@ def submit_ballot (request, election_slug):
                     }
 
                     transaction.commit()
-                    return HttpResponse(json.dumps(response))
+                    return HttpResponse(json.dumps(response), 'application/json')
 
                 else:
                     response = {
@@ -148,7 +148,7 @@ def submit_ballot (request, election_slug):
                     }
 
                     transaction.rollback()
-                    return HttpResponse(json.dumps(response))
+                    return HttpResponse(json.dumps(response), 'application/json')
 
 
             else:
@@ -181,4 +181,5 @@ def bulletinboard (request, race_slug):
         output = json.dumps(ballot_list)
         return render_to_response('referenda/bulletinboard.html',
                               locals(),
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request),
+                              mimetype='application/json')
