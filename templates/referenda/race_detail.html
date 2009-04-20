@@ -8,12 +8,10 @@
     <p>Votes which have been cast in this race will appear below.</p>
     <h2>Bulletin board</h2>
     {% if object.sealedvotes.all %}
-    <p>Total votes: {{ object.sealedvotes.count }} | <a href="{% url referenda.bulletinboard object.election.slug object.slug %}">Download JSON file</a></p>
-    <dl class="table bulletinboard">
-        {% for vote in object.sealedvotes.all %}
-        <dt>{{ vote.user_id }}</dt>
-        <dd><pre>{{ vote.ballot.block|safe }}</pre></dd>
-        {% endfor %}
+    <p>Total votes: {{ object.sealedvotes.count }}</p>
+    <dl class="table">
+        <dt>Cast ballots:</dt>
+        <dd><a href="{% url referenda.bulletinboard object.election.slug object.slug %}">Download JSON file</a></dd>
     </dl>
     <div class="clear"></div>
     {% endif %}
