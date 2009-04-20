@@ -273,7 +273,7 @@ REFERENDA.BOOTH.Controller = Class.extend({
                                                 $(messagePane).append('<h1>Success!</h1>');
                                                 $(messagePane).append('<p>' + data.message + '</p>');
                                                 $(messagePane).append('<p>In order to verify that your ballot was counted correctly, <strong>please save this receipt number</strong>. When you go to verify your ballot, you will be prompted to enter it.</p>');
-                                                $(messagePane).append('<p><strong>Your receipt:</strong><br/>' + REFERENDA.BOOTH.BALLOT.receipt + '</p>');
+                                                $(messagePane).append('<p><strong>Your receipt:</strong><br/>' + REFERENDA.BOOTH.BALLOT.receipt.toJSONObject() + '</p>');
                                                 $(messagePane).append($('<a class="button continue">Continue</a>').click(function() { $.modal.close(); window.location = '../../../'; }));
                                             }
                                             else if (data.status == 'duplicate') {
