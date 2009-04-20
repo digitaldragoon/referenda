@@ -181,11 +181,6 @@ dt
     clear: both;
 }
 
-dl.bulletinboard dd
-{
-    font-size: 8px;
-}
-
 .column.long
 {
     float: left;
