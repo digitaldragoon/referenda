@@ -1,3 +1,6 @@
+class Unavailable (Exception):
+    pass
+
 class InvalidCredentials (Exception):
     pass
 
