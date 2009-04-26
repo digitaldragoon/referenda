@@ -8,20 +8,26 @@ class UpsGeneralAuth (BaseAuth):
     blocked_groups = []
 
     def _ldap_bind(self):
-        ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, '%s/dm3.pem' % os.path.dirname(__file__))
-        con = ldap.initialize("ldaps://%s" % self.LDAP_SERVER)
-        con.simple_bind_s('LDAP Authenticator', 'Sspr609z')
-        return con
+        try:
+            ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, '%s/dm3.pem' % os.path.dirname(__file__))
+            con = ldap.initialize("ldaps://%s" % self.LDAP_SERVER)
+            con.simple_bind_s('LDAP Authenticator', 'Sspr609z')
+            return con
+        except ldap.SERVER_DOWN:
+            raise Unavailable
 
     def _ldap_search(self, con, user_id, ret):
-        base = "dc=pugetsound,dc=edu"
-        scope = ldap.SCOPE_SUBTREE
-        filter = "(SAMAccountName=" + user_id + ")"
-
-        result_id = con.search(base, scope, filter, ret)
-        result_type, result_data = con.result(result_id, 0)
-
-        return result_data[0][1]
+        try:
+            base = "dc=pugetsound,dc=edu"
+            scope = ldap.SCOPE_SUBTREE
+            filter = "(SAMAccountName=" + user_id + ")"
+    
+            result_id = con.search(base, scope, filter, ret)
+            result_type, result_data = con.result(result_id, 0)
+    
+            return result_data[0][1]
+        except ldap.SERVER_DOWN:
+            raise Unavailable
 
     def _get_groups(self, con, user_id):
         # compile groups
@@ -75,6 +81,8 @@ class UpsGeneralAuth (BaseAuth):
                     raise Unauthorized
             except ldap.OPERATIONS_ERROR:
                 raise InvalidCredentials
+            except ldap.SERVER_DOWN:
+                raise Unavailable
 
 class UpsStudentAuth (UpsGeneralAuth):
     necessary_groups = ['StudentAccts',]
