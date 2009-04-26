@@ -457,6 +457,10 @@ REFERENDA.BOOTH.Controller = Class.extend({
                         waitMessage.remove();
                         REFERENDA.BOOTH.CONTROL.displayMessage(data.message);
                     }
+                    else if (data.status == 'unavailable') {
+                        waitMessage.remove();
+                        REFERENDA.BOOTH.CONTROL.displayMessage(data.message);
+                    }
                     else if (data.status == 'forbidden') {
                         waitMessage.remove();
                         REFERENDA.BOOTH.CONTROL.displayMessage(data.message,
@@ -474,7 +478,7 @@ REFERENDA.BOOTH.Controller = Class.extend({
                 },
                 // something's broken - display an error
                 error: function (data) {
-                    REFERENDA.BOOTH.CONTROL.displayMessage('The server encountered an error while attempting to log you in. Please try again in a few moments. If the problem persists, <a href="mailto:' + REFERENDA.BOOTH.SESSION.election.admin_email + '">contact the administrator</a>.');
+                    REFERENDA.BOOTH.CONTROL.displayMessage('The server encountered an error while attempting to log you in. Please try again in a few moments. If the problem persists, <a href="..">contact the administrator</a>.');
                     $('#login_frame .wait').remove();
                 }
            });

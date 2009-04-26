@@ -49,6 +49,9 @@ def booth (request, election_slug):
             except Unauthorized:
                 data = {'status': 'forbidden',
                         'message': "You are not allowed to vote in this election.",}
+            except Unavailable:
+                data = {'status': 'unavailable',
+                        'message': "The authentication service is currently down. Please try again later.",}
             else:
 
                 if credentials == None:
