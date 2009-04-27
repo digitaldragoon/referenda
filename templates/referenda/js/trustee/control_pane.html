@@ -1,0 +1,39 @@
+<div class="cap top"></div>
+<div id="main">
+    <h1>Trustee - {{ election.name }}</h1>
+    <div id="nav-pane" class="trustee-div">
+        <div class="center wide">
+            <p>The election proceeds in phases. Completed phases appear in blue, while active phases are displayed in white. Click on a phase for more options.</p>
+            <ul id="trustee-nav" class="horizontal">
+                <li class="approve"><a>Approve</a></li>
+                <li class="vote"><a class="current">Vote</a></li>
+                <li class="tally"><a class="disabled">Tally</a></li>
+            </ul>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div id="approve-pane" class="trustee-div" style="display: none;">
+        <p><a class="nav-link" href="#">&#171; back to menu</a></p>
+        <p>Approval pane.</p>
+    </div>
+    <div id="vote-pane" class="trustee-div" style="display: none;">
+        <p><a class="nav-link" href="#">&#171; back to menu</a></p>
+        <div class="center wide">
+            <h3>Voting progress</h3>
+            <dl>
+                {% for race in election.races.all %}
+                <dt>{{ race.name }}</dt>        
+                <dd>Total votes: {{ race.sealedvotes.count }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+    {% ifequal election.stage "tally" %}
+    <div id="tally-pane" class="trustee_div" style="display: none;">
+        <p><a class="nav-link" href="#">&#171; back to menu</a></p>
+        <p>Tally pane.</p>
+    </div>
+    {% endifequal %}
+</div>
+<div class="clear"></div>
+<div class="cap bottom"></div>

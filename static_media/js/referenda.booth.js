@@ -122,11 +122,11 @@ REFERENDA.BOOTH.Controller = Class.extend({
         this.TEMPLATES = {};
 
         // setup templates
-        this.createTemplate('LOGIN_FRAME', 'templates/login_frame/');
-        this.createTemplate('MESSAGE_ALERT', 'templates/message_alert/');
-        this.createTemplate('MESSAGE_CONFIRM', 'templates/message_confirm/');
-        this.createTemplate('BALLOT_PANE', 'templates/ballot_pane/');
-        this.createTemplate('SUBMISSION_PANE', 'templates/submission_pane/');
+        this.TEMPLATES.LOGIN_FRAME = new REFERENDA.Template('login_frame');
+        this.TEMPLATES.MESSAGE_ALERT = new REFERENDA.Template('message_alert');
+        this.TEMPLATES.MESSAGE_CONFIRM = new REFERENDA.Template('message_confirm');
+        this.TEMPLATES.BALLOT_PANE = new REFERENDA.Template('ballot_pane');
+        this.TEMPLATES.SUBMISSON_PANE = new REFERENDA.Template('submission_pane');
     },
 
     /* Activates the nav links on the progress panel. */
@@ -241,7 +241,7 @@ REFERENDA.BOOTH.Controller = Class.extend({
                             position: ['20px',]
                         });
 
-                    var waitMessage = REFERENDA.BOOTH.CONTROL.createWaitMessage('Please wait while we encrypt your ballot...');
+                    var waitMessage = REFERENDA.createWaitMessage('Please wait while we encrypt your ballot...');
                     $(messagePane).find('#submission-pane-ballot-pane').after(waitMessage);
 
                     REFERENDA.BOOTH.BALLOT.encrypt();
@@ -258,7 +258,7 @@ REFERENDA.BOOTH.Controller = Class.extend({
                             ballot: REFERENDA.BOOTH.BALLOT.ciphertext
                         };
 
-                        var waitMessage = REFERENDA.BOOTH.CONTROL.createWaitMessage('Submitting your ballot...');
+                        var waitMessage = REFERENDA.createWaitMessage('Submitting your ballot...');
                         $(messagePane).append(waitMessage);
 
                         $.ajax({
@@ -314,33 +314,11 @@ REFERENDA.BOOTH.Controller = Class.extend({
         });
     },
 
-    /* Create a template object for use later in the program */
-    createTemplate: function(name, template_path) {
-        this.TEMPLATES[name] = $('<div></div>');
-        this.TEMPLATES[name].setTemplateURL(template_path, undefined, {filter_data: false});
-        this.TEMPLATES[name].getContents = function() {
-                    return $(this.html());
-                };
-    },
-
     activateControls: function() {
         this.activateNavLinks();
         this.activateCandidateSelection();
         this.activateCastVoteButtons();
         this.activateSubmissionButton();
-    },
-
-    /* Create a wait message - designed to be used with a spinning "busy" icon*/
-    createWaitMessage: function(message) {
-        var wait = $(document.createElement('p')).addClass('wait').text(message);
-        wait.done = function(appendMessage) {
-            this.removeClass('wait');
-            if (appendMessage != undefined) {
-                this.text(this.text() + appendMessage);
-            }
-        }
-
-        return wait;
     },
 
     /* Bring up the login screen */
@@ -437,7 +415,7 @@ REFERENDA.BOOTH.Controller = Class.extend({
         var request_data = {user_id: user_id, password: password};
 
         $(this.container).find('#login_frame').find('p.wait').remove();
-        var waitMessage = this.createWaitMessage('Logging in...');
+        var waitMessage = REFERENDA.createWaitMessage('Logging in...');
         $(this.container).find('#login_frame').append(waitMessage);
 
         BigInt.setup();

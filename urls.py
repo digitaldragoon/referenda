@@ -14,5 +14,5 @@ urlpatterns = patterns('',
     url(r'^election/(?P<election_slug>[-_a-z0-9]+)/trustee/$', 'referenda.views.trustee', name='referenda.trustee'),
     url(r'^election/(?P<election_slug>[-_a-z0-9]+)/vote/$', 'referenda.views.booth', name='referenda.booth'),
     url(r'^election/(?P<election_slug>[-_a-z0-9]+)/vote/submit/$', 'referenda.views.submit_ballot', name='referenda.submit_ballot'),
-    url(r'^election/(?P<election_slug>[-_a-z0-9]+)/vote/templates/(?P<template_name>.*)/$', 'referenda.views.javascript_template', name='referenda.javascript_template'),
+    url(r'^election/(?P<election_slug>[-_a-z0-9]+)/(?P<type>vote|trustee)/templates/(?P<template_name>.*)/$', 'referenda.views.javascript_template', name='referenda.javascript_template'),
 )

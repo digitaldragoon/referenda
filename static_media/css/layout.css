@@ -200,6 +200,28 @@ div.center
     padding: 30px 20px;
     text-align: center;
 }
+div.center.wide
+{
+    width: 500px;
+}
+#trustee-nav
+{
+    display: block;
+    margin: 0 auto;
+    width: 388px;
+}
+#trustee-nav li
+{
+    display: block;
+    float: left;
+}
+
+.trustee-div 
+{
+    width: 100%;
+    float: left;
+    margin-right: -100%;
+}
 
 div.advanced-control.left
 {

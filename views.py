@@ -4,6 +4,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseNotAllowed, Http404
 from django.core import serializers
 from django.utils import simplejson as json
+from django.contrib.auth import authenticate
 from referenda.models import *
 from referenda.forms import *
 from referenda.crypto import utils as cryptoutils
@@ -27,7 +28,27 @@ def trustee (request, election_slug):
     except Election.DoesNotExist:
         raise Http404
     else:
-        return render_to_response('referenda/trustee.html',
+        if request.method == 'POST':
+            try:
+                authority = election.authorities.get(user__username=request.POST['user_id'])
+            except User.DoesNotExist:
+                data = {'status': 'forbidden',
+                        'message': "You are not an election authority in this election.",}
+            else:
+                user = authenticate(username=request.POST['user_id'], password=request.POST['password'])
+
+                if user != None:
+                    data = {'status': 'success'}
+
+                else:
+                    data = {'status': 'invalid',
+                            'message': 'The username and password you entered were not valid.',}
+
+
+            return HttpResponse(json.dumps(data))
+
+        else:
+            return render_to_response('referenda/trustee.html',
                                   locals(),
                                   context_instance=RequestContext(request))
 
@@ -80,13 +101,13 @@ def booth (request, election_slug):
                               locals(),
                               context_instance=RequestContext(request))
 
-def javascript_template (request, election_slug, template_name):
+def javascript_template (request, election_slug, type, template_name):
     try:
         election = Election.objects.get(slug=election_slug)
     except Election.DoesNotExist:
         raise Http404
     else:
-        return render_to_response('referenda/js/%s.html' % template_name, locals(), context_instance=RequestContext(request));
+        return render_to_response('referenda/js/%s/%s.html' % (type, template_name), locals(), context_instance=RequestContext(request));
 
 @transaction.commit_manually
 def submit_ballot (request, election_slug):

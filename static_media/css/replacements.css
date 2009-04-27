@@ -143,6 +143,37 @@ li.candidate.selected div.checkbox
     background-image: url("../img/checkbox_on.png");
 }
 
+#trustee-nav li a
+{
+    display: block;
+    height: 0px;
+    overflow: hidden;
+    padding-top: 125px;
+    background-position: 0 0;
+    cursor: pointer;
+    margin: 20px;
+}
+#trustee-nav li a:hover
+{
+    background-position: 0 125px;
+}
+#trustee-nav li.approve a
+{ width: 91px; background-image: url('../img/button_trustee_approve_complete.png'); }
+#trustee-nav li.approve a.current
+{ background-image: url('../img/button_trustee_approve_fade.png'); }
+#trustee-nav li.vote a
+{ width: 89px; background-image: url('../img/button_trustee_vote_complete.png'); }
+#trustee-nav li.vote a.current
+{ background-image: url('../img/button_trustee_vote_fade.png'); }
+#trustee-nav li.vote a.disabled
+{ background-image: url('../img/button_trustee_vote_disabled.png'); }
+#trustee-nav li.tally a
+{ width: 88px; background-image: url('../img/button_trustee_tally_complete.png'); }
+#trustee-nav li.tally a.current
+{ background-image: url('../img/button_trustee_tally_fade.png'); }
+#trustee-nav li.tally a.disabled
+{ background-image: url('../img/button_trustee_tally_disabled.png'); }
+
 /*------------------------------------------------------------------------------
  * MODAL DIALOGS
  *----------------------------------------------------------------------------*/

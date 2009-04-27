@@ -115,12 +115,6 @@ class Poll (models.Model):
     def __unicode__(self):
         return self.name
 
-    def generate_ballot (self):
-        """
-        Create a ballot from the parameters of the poll. Subclasses must implement this.
-        """
-        raise NotImplementedError, "subclasses must implement generate_ballot()"
-
     def _get_days_delta (self, then):
         delta = then - datetime.now()
         return delta.days
@@ -272,6 +266,17 @@ class Election (Poll):
         return json.dumps(parameters)
 
     parameters = property(_get_parameters)
+
+    def _get_stage(self):
+        if self.valid:
+            if self.is_past:
+                return 'tally'
+            else:
+                return 'vote'
+        else:
+            return 'approve'
+
+    stage = property(_get_stage)
 
     def has_voted(self, user_id):
         for race in self.races.all():
