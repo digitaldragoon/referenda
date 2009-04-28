@@ -16,17 +16,3 @@ class ElectionTestCase(TestCase):
 
         # election is now approved
         self.assert_(election.approved)
-
-class BallotFieldTestCase(TestCase):
-    fixtures = ['test_data',]
-
-    def testObjectRelationalMapping(self):
-        # putting a Ballot in the database
-        election = Election.objects.get(slug='my-election')
-        election.ballot = Ballot('absolutelybogushashcode')
-        election.save()
-        
-        # retrieve it from the database again
-        election = Election.objects.get(slug='my-election')
-        self.assert_(isinstance(election.ballot, Ballot))
-        self.assertEqual(election.ballot, u'absolutelybogushashcode')

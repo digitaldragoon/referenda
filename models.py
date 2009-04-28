@@ -41,32 +41,6 @@ class CommaSeparatedListField(models.TextField):
         elif isinstance(value, (list, tuple)):
             return self.MAGIC_STRING + u','.join(value)
 
-class BallotField(models.TextField):
-    """
-    Field which transparently translates between database strings and Python Ballot objects.
-    """
-    __metaclass__ = models.SubfieldBase
-
-    def to_python(self, value):
-        if isinstance(value, Ballot):
-            return value
-
-        elif isinstance(value, unicode) or isinstance(value, str):
-            return Ballot(value)
-
-        else:
-            raise TypeError, 'cannot translate value of type "%s" into value of type "Ballot"' % value.__class__.__name__
-
-    def get_db_prep_value(self, value):
-        if value == None:
-            return ''
-        
-        elif isinstance(value, Ballot):
-            return unicode(value)
-
-        else:
-            raise TypeError, 'value is not of type "Ballot"'
-
 ################################################################################
 # MODELS
 ################################################################################
@@ -187,6 +161,7 @@ class Election (Poll):
     order = models.CharField(max_length=50, choices=ORDER_CHOICES)
     authentication = models.CharField(max_length=200, choices=utils.get_auth_choices())
     public_key = models.TextField(blank=True)
+    is_tallied = models.BooleanField(default=False, editable=False)
 
     objects = PollManager()
 
@@ -270,7 +245,10 @@ class Election (Poll):
     def _get_stage(self):
         if self.valid:
             if self.is_past:
-                return 'tally'
+                if self.is_tallied:
+                    return 'finalize'
+                else:
+                    return 'tally'
             else:
                 return 'vote'
         else:
@@ -410,7 +388,7 @@ class SealedVote (models.Model):
     """
     user_id = models.CharField(max_length=100)
     race = models.ForeignKey(Race, related_name='sealedvotes')
-    ballot = BallotField()
+    ballot = models.TextField()
     timestamp = models.DateTimeField(auto_now=True, editable=False)
 
     def __unicode__(self):
@@ -425,31 +403,7 @@ class SealedVote (models.Model):
     class Meta:
         unique_together = ('user_id', 'race')
     
-class Ballot (unicode):
-    """
-    A string representation of an Election ballot. Note that ballots are immutable. Polls should be responsible for the code that generates a given ballot.
-    """
-
-    def _compute_hash(self):
-        """
-        Computes the hash of this ballot for signing.
-        """
-        #FIXME
-        raise NotImplementedError, "not yet implemented"
-    hash = property(_compute_hash)
-
-    def block(self):
-        """
-        Outputs the ballot as a block of text with line breaks suitable for rendering out to a page.
-        """
-        line_length = 50
-        sets = int(len(self)/line_length)
-        blockstring = ''
-        for i in range(sets):
-            blockstring += self[line_length*i:line_length*(i+1)] + '<br/>'
-        blockstring += self[line_length*sets:]
-
-        return blockstring
-
-    class Meta:
-        abstract = True
+class UnsealedVote(models.Model):
+    race = models.ForeignKey(Race, related_name='unsealedvotes')
+    receipt = models.CharField(max_length=40)
+    vote = models.CharField(max_length=256)

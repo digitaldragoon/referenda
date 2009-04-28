@@ -9,6 +9,39 @@ from referenda.models import *
 from referenda.forms import *
 from referenda.crypto import utils as cryptoutils
 
+import struct
+import operator
+from referenda.crypto import algs
+
+def election_detail (request, slug):
+    try:
+        election = Election.objects.get(slug=slug)
+    except Election.DoesNotExist:
+        raise Http404
+    else:
+        if election.is_tallied:
+            races = election.races.all()
+
+            for race in races:
+                tallydict = {}
+                total = 0
+
+                for ballot in race.unsealedvotes.all():
+                    total += 1
+                    if tallydict.has_key(ballot.vote):
+                        tallydict[ballot.vote] += 1;
+                    else:
+                        tallydict[ballot.vote] = 1;
+
+                race.votes = sorted(tallydict.items(), key=operator.itemgetter(1))
+                race.votes.reverse()
+                race.votes = [(x[0], x[1], x[1]/float(total)*100, int(x[1]/float(total)*100)) for x in race.votes]
+
+        return render_to_response('referenda/election_detail.html',
+                                  locals(),
+                                  context_instance=RequestContext(request))
+
+
 def preview (request, election_slug):
 
     try:
@@ -28,6 +61,9 @@ def trustee (request, election_slug):
     except Election.DoesNotExist:
         raise Http404
     else:
+        if election.is_tallied:
+            raise Http404
+
         if request.method == 'POST':
             try:
                 authority = election.authorities.get(user__username=request.POST['user_id'])
@@ -53,6 +89,60 @@ def trustee (request, election_slug):
             return render_to_response('referenda/trustee.html',
                                   locals(),
                                   context_instance=RequestContext(request))
+
+@transaction.commit_manually
+def submit_tally (request, election_slug):
+    def decode_string(string):
+        value = int(string)
+        hex = '%X' % value
+
+        plainstring = ''
+
+        i = 0
+        while i < len(hex):
+            plainstring += chr(int(hex[i:i+2], 16))
+            i += 2
+
+        return plainstring.strip('\0"')
+
+    try:
+        election = Election.objects.get(slug=election_slug)
+    except Election.DoesNotExist:
+        transaction.rollback()
+        raise Http404
+    else:
+        if request.method == 'POST':
+
+            if election.is_tallied or election.stage != 'tally':
+                raise Http404
+
+            data = json.loads(request.POST['data'])
+
+            for race in data:
+                ballots = data[race]
+                race_obj = election.races.get(slug=race)
+            
+                for ballot in ballots:
+                    receipt = decode_string(ballot['receipt'])
+                    if len(receipt) > 40:
+                        raise Exception, '+++' + receipt[40] + '+++'
+
+                    for answer in ballot['answers']:
+                        plain_answer = decode_string(answer)
+                        if plain_answer != 'None':
+                            vote = UnsealedVote(race=race_obj, receipt=receipt, vote=decode_string(answer))
+                            vote.save()
+
+                    transaction.commit()
+
+            election.is_tallied = True
+            election.save()
+            transaction.commit()
+            return HttpResponse(json.dumps({'status': 'success'}), mimetype='application/json')
+
+        else:
+            transaction.rollback()
+            return HttpResponseNotAllowed(['POST',])
 
 def booth (request, election_slug):
     from referenda.auth.standard import *

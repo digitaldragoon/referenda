@@ -1,39 +1,47 @@
 {% extends "referenda/base.html" %}
 
-{% block title %}{{ object.name }}{% endblock %}
+{% block title %}{{ election.name }}{% endblock %}
 
 {% block main %}
 <div class="column long">
-    <h1>{{ object.name }}</h1>
-    {% if object.is_upcoming %}<p>This election is scheduled to begin soon. Polls open <strong>{{ object.poll_opens|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_opens|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>{% endif %}
-    {% if object.is_current %}<p>This election is currently in progress. Polls close <strong>{{ object.poll_closes|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ object.poll_closes|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>{% endif %}
-    {% if object.is_past %}<p>This election is over.</p>{% endif %}
+    <h1>{{ election.name }}</h1>
+    {% if election.is_upcoming %}<p>This election is scheduled to begin soon. Polls open <strong>{{ election.poll_opens|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ election.poll_opens|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>{% endif %}
+    {% if election.is_current %}<p>This election is currently in progress. Polls close <strong>{{ election.poll_closes|date:"F\&\n\b\s\p\;j,\&\n\b\s\p\;Y"|safe }}</strong> at <strong>{{ election.poll_closes|date:"g:i\&\n\b\s\p\;A"|safe }}</strong>.</p>{% endif %}
+    {% if election.is_past %}<p>This election is over.</p>{% endif %}
     <h2>Races for this election</h2>
-    {% if object.races.all %}
+    {% if election.races.all %}
     <dl>
-        {% for race in object.races.all %}
+        {% if election.is_tallied %}
+        {% for race in races %}
         <dt>{{ race.name }}</dt>
+        {% for candidate in race.votes %}
+        <dd><div class="tally-bar"><div class="bar" style="width: {{ candidate.3 }}%;"></div></div>{{ candidate.0 }} ({{ candidate.1 }} votes, {{ candidate.3 }}%)</dd>
+        {% endfor %}
+        {% endfor %}
+        {% else %}
+        {% for race in election.races.all %}
         <dd>{% for candidate in race.candidates.all %}{% if forloop.first %}{% else %}, {% endif %}{{ candidate.full_name }}{% endfor %}</dd>
         {% endfor %}
+        {% endif %}
     </dl>
     {% endif %}
-    {% if object.is_submissible %}<a class="button votenow" href="{% url referenda.booth object.slug %}">Vote Now!</a>{% endif %}
+    {% if election.is_submissible %}<a class="button votenow" href="{% url referenda.booth election.slug %}">Vote Now!</a>{% endif %}
 </div>
 <div class="column short">
     <h1>Administrators</h1>
     <dl>
-        <dt>Adminstrator <span class="link">(<a href="#">login&nbsp;&#187;</a>)</span></dt>
-        <dd>{{ object.administrator.first_name }} {{ object.administrator.last_name }} <span class="link">(<a href="mailto:{{ object.administrator.email }}">contact</a>)</span></dd>
-        <dt>Election Authorities <span class="link">(<a href="{% url referenda.trustee object.slug %}">login&nbsp;&#187;</a>)</span></dt>
-        {% if object.authorities %}
-        {% for authority in object.authorities.all %}
+        <dt>Adminstrator{% if election.is_tallied %}{% else %} <span class="link">(<a href="#">login&nbsp;&#187;</a>)</span>{% endif %}</dt>
+        <dd>{{ election.administrator.first_name }} {{ election.administrator.last_name }} <span class="link">(<a href="mailto:{{ election.administrator.email }}">contact</a>)</span></dd>
+        <dt>Election Authorities{% if election.is_tallied %}{% else %} <span class="link">(<a href="{% url referenda.trustee election.slug %}">login&nbsp;&#187;</a>)</span>{% endif %}</dt>
+        {% if election.authorities %}
+        {% for authority in election.authorities.all %}
         <dd>{{ authority.user.first_name }} {{ authority.user.last_name }} <span class="link">(<a href="mailto:{{ authority.user.email }}">contact</a>)</span></dd>
         {% endfor %}
         {% else %}
         <dd>This election does not currently have any election authorities.</dd>
         {% endif %}
     </dl>
-    <a class="button previewballot" href="{% url referenda.ballot_preview object.slug %}">Preview Ballot</a>
+    <a class="button previewballot" href="{% url referenda.ballot_preview election.slug %}">Preview Ballot</a>
 </div>
 
 {% endblock %}

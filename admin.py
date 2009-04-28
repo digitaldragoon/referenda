@@ -41,3 +41,5 @@ class SealedVoteAdmin(admin.ModelAdmin):
     list_filter = ('race',)
     list_select_related = True
 admin.site.register(SealedVote, SealedVoteAdmin)
+
+admin.site.register(UnsealedVote)

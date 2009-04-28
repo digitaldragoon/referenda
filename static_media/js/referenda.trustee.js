@@ -45,19 +45,21 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
                 REFERENDA.TRUSTEE.CONTROL.navigateToNavPane();
             });
 
-        $('#secretkey').blur(function() {
-                try {
-                    var key = ElGamal.SecretKey.fromJSONObject($.secureEvalJSON($('#secretkey').val()));
-                } catch (e) {
-                    REFERENDA.TRUSTEE.CONTROL.displayMessage('The key you entered was not a valid secret key.');
-                    return;
+        $('#secretkey').keyup(function(e) {
+                if (e.keyCode != 8 && e.keyCode != 46) {
+                    try {
+                        var key = ElGamal.SecretKey.fromJSONObject($.secureEvalJSON($('#secretkey').val()));
+                    } catch (e) {
+                        REFERENDA.TRUSTEE.CONTROL.displayMessage('The key you entered was not a valid secret key.');
+                        return;
+                    }
+
+                    var tallybutton = $('<a class="button tally">Tally Now</a>');
+                    tallybutton.click(function() {REFERENDA.TRUSTEE.CONTROL.tallyVotes();});
+                    $('#secretkey').css('display', 'none');
+                    $('#tally-pane .center').append(tallybutton);
+
                 }
-
-                var tallybutton = $('<a class="button tally">Tally Now</a>');
-                tallybutton.click(function() {REFERENDA.TRUSTEE.CONTROL.tallyVotes();});
-                $('#secretkey').css('display', 'none');
-                $('#tally-pane .center').append(tallybutton);
-
             });
     },
 
@@ -262,7 +264,20 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
     },
 
     submitVotes: function(data) {
-        alert($.toJSON(data));
+        request_data = {data: $.toJSON(data)};
+
+        $.ajax({
+                type: 'POST',
+                url: './submit/',
+                data: request_data,
+                dataType: 'json',
+                success: function(data) {
+                    REFERENDA.TRUSTEE.CONTROL.displayMessage(data);
+                },
+                error: function(data) {
+                    REFERENDA.TRUSTEE.CONTROL.displayMessage('error!');
+                }
+            });
     }
 
 });
