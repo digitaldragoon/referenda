@@ -187,13 +187,13 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
         //$('#' + this.currentPane).css('display', 'none');    
         //$('#' + pane_id).css('display', 'block');
         $('#' + this.currentPane).slideLeftHide();
-        $('#' + pane_id).slideRightShow();
+        $(document).oneTime(200, undefined, function() {$('#' + pane_id).slideRightShow() });
         this.currentPane = pane_id;
     },
 
     navigateToNavPane: function() {
         $('#' + this.currentPane).slideRightHide();
-        $('#nav-pane').slideLeftShow();
+        $(document).oneTime(200, undefined, function() {$('#nav-pane').slideLeftShow();});
         this.currentPane = 'nav-pane';
     },
 

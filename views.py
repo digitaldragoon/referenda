@@ -192,19 +192,24 @@ def home (request):
                               locals(),
                               context_instance=RequestContext(request))
 
-def bulletinboard (request, race_slug):
+def bulletinboard (request, slug):
     try:
-        race = Race.objects.get(slug=race_slug)
-    except Race.DoesNotExist:
+        election = Election.objects.get(slug=slug)
+    except Election.DoesNotExist:
         raise Http404
     else:
-        ballots = race.sealedvotes.all()
-        ballot_list = []
+        finaldict = {}
+        for race in election.races.all():
 
-        for ballot in ballots:
-            ballot_list.append((ballot.user_id,ballot.ballot,))
+            ballots = race.sealedvotes.all()
+            ballot_list = []
 
-        output = json.dumps(ballot_list)
+            for ballot in ballots:
+                ballot_list.append((ballot.user_id,ballot.ballot,))
+
+            finaldict[race.slug] = ballot_list
+
+        output = json.dumps(finaldict)
         return render_to_response('referenda/bulletinboard.html',
                               locals(),
                               context_instance=RequestContext(request),

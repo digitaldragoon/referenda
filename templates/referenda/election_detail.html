@@ -10,11 +10,12 @@
     {% if object.is_past %}<p>This election is over.</p>{% endif %}
     <h2>Races for this election</h2>
     {% if object.races.all %}
-    <ul>
+    <dl>
         {% for race in object.races.all %}
-        <li>{{ race.name }} <span class="link">(<a href="{% url referenda.race_detail race.election.slug race.slug %}">detail&nbsp;&#187;</a>)</span></li>
+        <dt>{{ race.name }}</dt>
+        <dd>{% for candidate in race.candidates.all %}{% if forloop.first %}{% else %}, {% endif %}{{ candidate.full_name }}{% endfor %}</dd>
         {% endfor %}
-    </ul>
+    </dl>
     {% endif %}
     {% if object.is_submissible %}<a class="button votenow" href="{% url referenda.booth object.slug %}">Vote Now!</a>{% endif %}
 </div>
