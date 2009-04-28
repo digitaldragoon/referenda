@@ -83,5 +83,10 @@ REFERENDA.createProgressBar = function(ticks) {
         this.find('.bar').css('width', (Math.floor(this.currentTicks/this.ticks*100)).toString() + '%');
     };
 
+    content.setNumTicks = function(ticks) {
+        this.ticks = ticks;
+        this.setTick(this.currentTicks);
+    };
+
     return content;
 };

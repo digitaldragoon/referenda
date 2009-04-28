@@ -15,6 +15,8 @@
 
 li.hovered
 {
+    padding: 11px;
+    padding-bottom: 9px;
     padding-left: 9px;
     padding-top: 9px;
 }
@@ -23,11 +25,6 @@ li.election
     padding-top: 12px;
     padding-left: 12px;
     background-image: none;
-}
-li.hovered
-{
-    padding: 11px;
-    padding-bottom: 7px;
 }
 
 #js-warning

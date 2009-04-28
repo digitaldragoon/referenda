@@ -14,11 +14,6 @@ var dialogAnimations = {
                             });
                         });
           },
-    show: function(dialog) {
-                $(document).oneTime(800, 'foc',  function() {
-                            dialog.data.find('a.button')[0].focus();
-                        });
-          },
     showHigh: function(dialog) {
                 dialog.container.css('position', 'absolute');
           }
@@ -26,7 +21,6 @@ var dialogAnimations = {
 $.modal.defaults.close = false;
 $.modal.defaults.onClose = dialogAnimations.close;
 $.modal.defaults.onOpen = dialogAnimations.open;
-$.modal.defaults.onShow = dialogAnimations.show;
 
 
 REFERENDA.BOOTH = {};
@@ -44,8 +38,17 @@ REFERENDA.BOOTH.Ballot = Class.extend({
     },
 
     /* Encrypts this ballot */
-    encrypt: function() {
+    encrypt: function(progress) {
         var ciphertext = {};
+
+        if (progress) {
+            var numTicks = 0;
+            for (var key in this.answers) {
+                numTicks += REFERENDA.BOOTH.SESSION.getRace(key).numChoices + 1;
+            }
+            progress.setNumTicks(numTicks);
+        }
+        
 
         for (var key in this.answers) {
             // do encryption
@@ -54,16 +57,19 @@ REFERENDA.BOOTH.Ballot = Class.extend({
             ciphertext[key] = {};
 
             ciphertext[key]['receipt'] = ElGamal.encryptString($.toJSON(this.receipt), pk).toJSONObject();
+            if (progress) progress.tick();
             ciphertext[key]['answers'] = new Array();
                 
             // "real" answers
             for (var i = 0; i < this.answers[key].length; i++) {
                 ciphertext[key]['answers'][i] = ElGamal.encryptString($.toJSON(this.answers[key][i]), pk).toJSONObject();
+                if (progress) progress.tick();
             }
 
             // "padding" answers to fill out incomplete ballots
             while (i < REFERENDA.BOOTH.SESSION.getRace(key).numChoices) {
                 ciphertext[key]['answers'][i] = ElGamal.encryptString($.toJSON('None'), pk).toJSONObject();
+                if (progress) progress.tick();
                 i++;
             }
         }
@@ -228,7 +234,6 @@ REFERENDA.BOOTH.Controller = Class.extend({
 
                     $(messagePane).modal({
                             onShow: function(d) {
-                                dialogAnimations.show(d);
                                 dialogAnimations.showHigh(d);
                             },
                             position: ['20px',]
@@ -237,9 +242,13 @@ REFERENDA.BOOTH.Controller = Class.extend({
                     var waitMessage = REFERENDA.createWaitMessage('Please wait while we encrypt your ballot...');
                     $(messagePane).find('.submitballot').before(waitMessage);
 
-                    REFERENDA.BOOTH.BALLOT.encrypt();
+                    var progressBar = REFERENDA.createProgressBar(0);
+                    $(messagePane).find('.submitballot').before(progressBar);
+
+                    REFERENDA.BOOTH.BALLOT.encrypt(progressBar);
                     
                     waitMessage.done('done!');
+                    $(progressBar).remove();
 
                     // activate submit link
                     $(messagePane).find('.button.submitballot').click(function() {
