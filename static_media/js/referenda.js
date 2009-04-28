@@ -65,3 +65,23 @@ REFERENDA.createWaitMessage = function(message) {
 
         return wait;
 };
+
+
+REFERENDA.createProgressBar = function(ticks) {
+    var content = $('<div class="progress-bar"><div class="bar" style="width: 0%;"></div></div>');
+    content.ticks = ticks;
+    content.currentTicks = 0;
+
+    content.tick = function() {
+        this.currentTicks++;
+        this.setTick(this.currentTicks);
+    };
+
+    content.setTick = function(tick) {
+        this.currentTicks = tick;
+        this.currentTicks = Math.min(this.ticks, this.currentTicks);
+        this.find('.bar').css('width', (Math.floor(this.currentTicks/this.ticks*100)).toString() + '%');
+    };
+
+    return content;
+};

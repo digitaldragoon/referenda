@@ -232,7 +232,8 @@ div.advanced-control.right
     float: right;
 }
 div.advanced-control textarea,
-#submission-pane textarea
+#submission-pane textarea,
+#tally-pane textarea
 {
     font-size: 9px;
 }
@@ -265,3 +266,4 @@ li.candidate input
 {
     margin: 5px 0;
 }
+

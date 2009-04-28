@@ -5,16 +5,18 @@
         <div class="center wide">
             <p>The election proceeds in phases. Completed phases appear in blue, while active phases are displayed in white. Click on a phase for more options.</p>
             <ul id="trustee-nav" class="horizontal">
-                <li class="approve"><a>Approve</a></li>
-                <li class="vote"><a class="current">Vote</a></li>
-                <li class="tally"><a class="disabled">Tally</a></li>
+                <li class="approve"><a{% ifequal election.stage "approve" %} class="current"{% endifequal %}>Approve</a></li>
+                <li class="vote"><a{% ifequal election.stage "approve" %} class="disabled"{% else %}{% ifequal election.stage "vote"%} class="current"{% endifequal %}{% endifequal %}>Vote</a></li>
+                <li class="tally"><a{% ifequal election.stage "approve" %} class="disabled"{% else %}{% ifequal election.stage "vote" %} class="disabled"{% else %}{% ifequal election.stage "tally" %} class="current"{% endifequal %}{% endifequal %}{% endifequal %}>Tally</a></li>
             </ul>
             <div class="clear"></div>
         </div>
     </div>
     <div id="approve-pane" class="trustee-div" style="display: none;">
         <p><a class="nav-link" href="#">&#171; back to menu</a></p>
-        <p>Approval pane.</p>
+        <div class="center wide">
+            <p>Approval pane not implemented yet.</p>
+        </div>
     </div>
     <div id="vote-pane" class="trustee-div" style="display: none;">
         <p><a class="nav-link" href="#">&#171; back to menu</a></p>
@@ -31,7 +33,10 @@
     {% ifequal election.stage "tally" %}
     <div id="tally-pane" class="trustee_div" style="display: none;">
         <p><a class="nav-link" href="#">&#171; back to menu</a></p>
-        <p>Tally pane.</p>
+        <div class="center wide">
+            <p>The election is ready to be tallied. Paste your <strong>SECRET KEY</strong> into the box below to tally the election.</p>
+            <textarea id="secretkey" rows="5" cols="50" />
+        </div>
     </div>
     {% endifequal %}
 </div>

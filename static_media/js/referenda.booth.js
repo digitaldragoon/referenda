@@ -43,24 +43,32 @@ REFERENDA.BOOTH.Ballot = Class.extend({
         this.receipt = Random.getRandomInteger(new BigInt("340282366920938463463374607431768211456", 10)); // 2^128
     },
 
-    /* Encrypts this ballo */
+    /* Encrypts this ballot */
     encrypt: function() {
-        this.encryptedAnswers = {};
+        var ciphertext = {};
 
         for (var key in this.answers) {
-            if (this.answers[key].length > 0) {
-                // do encryption
-                var pk = REFERENDA.BOOTH.SESSION.election.pk;
+            // do encryption
+            var pk = REFERENDA.BOOTH.SESSION.election.pk;
 
-                var plaintext = {};
-                plaintext['receipt'] = this.receipt;
-                plaintext['answers'] = this.answers[key];
+            ciphertext[key] = {};
 
-                this.encryptedAnswers[key] = ElGamal.encryptString($.toJSON(plaintext), pk).toJSONObject();
+            ciphertext[key]['receipt'] = ElGamal.encryptString($.toJSON(this.receipt), pk).toJSONObject();
+            ciphertext[key]['answers'] = new Array();
+                
+            // "real" answers
+            for (var i = 0; i < this.answers[key].length; i++) {
+                ciphertext[key]['answers'][i] = ElGamal.encryptString($.toJSON(this.answers[key][i]), pk).toJSONObject();
+            }
+
+            // "padding" answers to fill out incomplete ballots
+            while (i < REFERENDA.BOOTH.SESSION.getRace(key).numChoices) {
+                ciphertext[key]['answers'][i] = ElGamal.encryptString($.toJSON('None'), pk).toJSONObject();
+                i++;
             }
         }
 
-        this.ciphertext = $.toJSON(this.encryptedAnswers);
+        this.ciphertext = $.toJSON(ciphertext);
     },
 
     isComplete: function() {
@@ -126,7 +134,7 @@ REFERENDA.BOOTH.Controller = Class.extend({
         this.TEMPLATES.MESSAGE_ALERT = new REFERENDA.Template('message_alert');
         this.TEMPLATES.MESSAGE_CONFIRM = new REFERENDA.Template('message_confirm');
         this.TEMPLATES.BALLOT_PANE = new REFERENDA.Template('ballot_pane');
-        this.TEMPLATES.SUBMISSON_PANE = new REFERENDA.Template('submission_pane');
+        this.TEMPLATES.SUBMISSION_PANE = new REFERENDA.Template('submission_pane');
     },
 
     /* Activates the nav links on the progress panel. */
@@ -218,21 +226,6 @@ REFERENDA.BOOTH.Controller = Class.extend({
                     template.processTemplate({message: message});
                     var messagePane = template.getContents();
 
-                    $(messagePane).find('#submission-pane-ballot').val(REFERENDA.BOOTH.BALLOT.toJSON());
-
-                    $(messagePane).find('#submission-pane-inspect-ballot').click(function() {
-                                var ballotPane = $(this).closest('#submission-pane').find('#submission-pane-ballot-pane');
-
-                                if ($(ballotPane).css('display') == 'none') {
-                                    $(ballotPane).slideDown();
-                                    $(this).addClass('checked');
-                                }
-                                else {
-                                    $(ballotPane).slideUp();
-                                    $(this).removeClass('checked');
-                                }
-                            });
-
                     $(messagePane).modal({
                             onShow: function(d) {
                                 dialogAnimations.show(d);
@@ -242,12 +235,10 @@ REFERENDA.BOOTH.Controller = Class.extend({
                         });
 
                     var waitMessage = REFERENDA.createWaitMessage('Please wait while we encrypt your ballot...');
-                    $(messagePane).find('#submission-pane-ballot-pane').after(waitMessage);
+                    $(messagePane).find('.submitballot').before(waitMessage);
 
                     REFERENDA.BOOTH.BALLOT.encrypt();
                     
-                    $(messagePane).find('#submission-pane-ciphertext').val(REFERENDA.BOOTH.BALLOT.ciphertext);
-
                     waitMessage.done('done!');
 
                     // activate submit link

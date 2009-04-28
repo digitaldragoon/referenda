@@ -533,7 +533,7 @@ ElGamal.fiatshamir_dlog_challenge_generator = function(commitment) {
 };
 
 ElGamal.encryptString = function(input, pk) {
-    var plaintext = new ElGamal.Plaintext(new BigInt(binb2hex(str2binb(input)), 16), pk, true);
+    var plaintext = new ElGamal.Plaintext(new BigInt(binb2hex(str2binb(input)), 16), pk, false);
             
     return ElGamal.encrypt(pk, plaintext);
 };

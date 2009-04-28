@@ -38,7 +38,9 @@ def trustee (request, election_slug):
                 user = authenticate(username=request.POST['user_id'], password=request.POST['password'])
 
                 if user != None:
-                    data = {'status': 'success'}
+                    data = {'status': 'success',
+                            'races': [x['slug'] for x in election.races.all().values('slug')]
+                           }
 
                 else:
                     data = {'status': 'invalid',

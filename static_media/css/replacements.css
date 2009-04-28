@@ -70,6 +70,10 @@ a.button.castvote
 {
     background-image: url("../img/button_castvote.png");
 }
+a.button.tally
+{
+    background-image: url("../img/button_tally.png");
+}
 
 #advanced-panel a.button
 {
@@ -173,6 +177,17 @@ li.candidate.selected div.checkbox
 { background-image: url('../img/button_trustee_tally_fade.png'); }
 #trustee-nav li.tally a.disabled
 { background-image: url('../img/button_trustee_tally_disabled.png'); }
+
+div.progress-bar
+{
+    height: 20px;
+    background-color: #ffffff;
+}
+div.progress-bar div.bar
+{
+    height: 100%;
+    background-color: #6156ca;
+}
 
 /*------------------------------------------------------------------------------
  * MODAL DIALOGS

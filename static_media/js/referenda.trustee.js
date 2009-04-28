@@ -44,6 +44,21 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
         $('.nav-link').click(function() {
                 REFERENDA.TRUSTEE.CONTROL.navigateToNavPane();
             });
+
+        $('#secretkey').blur(function() {
+                try {
+                    var key = ElGamal.SecretKey.fromJSONObject($.secureEvalJSON($('#secretkey').val()));
+                } catch (e) {
+                    REFERENDA.TRUSTEE.CONTROL.displayMessage('The key you entered was not a valid secret key.');
+                    return;
+                }
+
+                var tallybutton = $('<a class="button tally">Tally Now</a>');
+                tallybutton.click(function() {REFERENDA.TRUSTEE.CONTROL.tallyVotes();});
+                $('#secretkey').css('display', 'none');
+                $('#tally-pane .center').append(tallybutton);
+
+            });
     },
 
     /* Bring up a modal confirmation dialog */
@@ -132,6 +147,7 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
                 data: request_data,
                 success: function (data) {
                     if (data.status == 'success') {
+                        REFERENDA.TRUSTEE.CONTROL.races = data['races'];
                         REFERENDA.TRUSTEE.CONTROL.isLoggedIn = true;
                         REFERENDA.TRUSTEE.CONTROL.loadControlPane();
                     }
@@ -179,7 +195,58 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
         $('#' + this.currentPane).slideRightHide();
         $('#nav-pane').slideLeftShow();
         this.currentPane = 'nav-pane';
+    },
+
+    tallyVotes: function() {
+        var wait = REFERENDA.createWaitMessage('Decrypting votes...');
+
+        var sk = ElGamal.SecretKey.fromJSONObject($.secureEvalJSON($('#secretkey').val()));
+        
+        $('#tally-pane .button.tally').remove();
+        $('#tally-pane .center').append(wait);
+
+        var DATA = {};
+
+        for (race in this.races) {
+            var racename = this.races[race];
+            DATA[racename] = new Array();
+
+            alert(racename);
+
+            // get votes
+            $.ajaxq('racequeue', {
+                    url: '../race/' + this.races[race] + '/bulletinboard.json',
+                    cache: false, 
+                    success: function(data) {
+                        data = $.secureEvalJSON(data);
+                        var progress = REFERENDA.createProgressBar(data.length);
+                        $('#tally-pane .center').append(progress);
+
+                        var racename = this.races[race];
+    
+                        for (row in data) {
+                            var ballot = $.secureEvalJSON(data[row][1].replace(/u?\'/g, '"'));
+                            var ciphertext = ElGamal.Ciphertext.fromJSONObject(ballot, sk.pk);
+                            var factors = [sk.decryptionFactor(ciphertext)];
+                            var plaintext = ciphertext.decrypt(factors);
+
+                            DATA[racename][DATA[racename].length] = plaintext.getM();
+    
+                            progress.tick();
+                        }
+
+                        REFERENDA.TRUSTEE.CONTROL.submitVotes(DATA);
+                    }
+            });
+        }
+
+
+    },
+
+    submitVotes: function(data) {
+        alert($.toJSON(data));
     }
+
 });
 
 
