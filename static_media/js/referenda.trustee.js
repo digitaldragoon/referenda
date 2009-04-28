@@ -207,38 +207,56 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
 
         var DATA = {};
 
-        for (race in this.races) {
-            var racename = this.races[race];
-            DATA[racename] = new Array();
-
-            alert(racename);
-
-            // get votes
-            $.ajaxq('racequeue', {
-                    url: '../race/' + this.races[race] + '/bulletinboard.json',
-                    cache: false, 
-                    success: function(data) {
-                        data = $.secureEvalJSON(data);
-                        var progress = REFERENDA.createProgressBar(data.length);
-                        $('#tally-pane .center').append(progress);
-
-                        var racename = this.races[race];
-    
-                        for (row in data) {
-                            var ballot = $.secureEvalJSON(data[row][1].replace(/u?\'/g, '"'));
-                            var ciphertext = ElGamal.Ciphertext.fromJSONObject(ballot, sk.pk);
-                            var factors = [sk.decryptionFactor(ciphertext)];
-                            var plaintext = ciphertext.decrypt(factors);
-
-                            DATA[racename][DATA[racename].length] = plaintext.getM();
-    
-                            progress.tick();
+        // get votes
+        $.getJSON('../bulletinboard.json',
+                function(data) {
+                    // calculate workload
+                    var numTicks = 0;
+                    for (race in data) {
+                        for (ballot in data[race]) {
+                            var realBallot = $.secureEvalJSON(data[race][ballot][1].replace(/u?\'/g,'"'));
+                            numTicks += realBallot['answers'].length + 1;
                         }
-
-                        REFERENDA.TRUSTEE.CONTROL.submitVotes(DATA);
                     }
-            });
-        }
+
+                    var progress = REFERENDA.createProgressBar(numTicks);
+                    $('#tally-pane .center').append(progress);
+
+                    for (race in data) {
+                        DATA[race] = new Array();
+
+                        for (ballot in data[race]) {
+                            var decryptedBallot = {};
+                            decryptedBallot['answers'] = new Array();
+
+                            var jsonBallot = $.secureEvalJSON(data[race][ballot][1].replace(/u?\'/g,'"'));
+                                
+                            // decrypt receipt
+                            var receiptCiphertext = ElGamal.Ciphertext.fromJSONObject(jsonBallot['receipt'], sk.pk)
+                            var decryptionFactor = [sk.decryptionFactor(receiptCiphertext)];
+                            decryptedBallot['receipt'] = receiptCiphertext.decrypt(decryptionFactor).getM();
+
+                            progress.tick()
+
+
+                            for (answer in jsonBallot['answers']) {
+                                var ciphertext = ElGamal.Ciphertext.fromJSONObject(jsonBallot['answers'][answer], sk.pk);
+                                var factors = [sk.decryptionFactor(ciphertext)];
+                                var plaintext = ciphertext.decrypt(factors);
+
+                                decryptedBallot['answers'][decryptedBallot['answers'].length] = plaintext.getM();
+
+                                progress.tick();
+
+                            }
+
+                            DATA[race][DATA[race].length] = decryptedBallot;
+                        }
+                    }
+    
+                    wait.done('done!');
+                    REFERENDA.TRUSTEE.CONTROL.submitVotes(DATA);
+                });
 
 
     },
