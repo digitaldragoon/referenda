@@ -263,6 +263,19 @@ class Election (Poll):
 
         return False
 
+    def unique_voters(self):
+        allvotes = SealedVote.objects.filter(race__election=self)
+
+        uniquevoters = {}
+
+        for vote in allvotes:
+            if not uniquevoters.has_key(vote.user_id):
+                uniquevoters[vote.user_id] = 0
+
+        ret = sorted(uniquevoters.keys())
+
+        return ret
+
 class ElectionAuthority (models.Model):
     """
     An administrator who acts as a validator and tabulator of an Election, but cannot set the parameters of an Election.

@@ -28,6 +28,8 @@
                 <dd>Total votes: {{ race.sealedvotes.count }}</dd>
                 {% endfor %}
             </dl>
+            <p>The following people have cast votes in this election:</p>
+            <p>{% for voter in election.unique_voters %}{% if forloop.first %}{% else %}, {% endif %}{{ voter }}{% endfor %}</p>
         </div>
     </div>
     {% ifequal election.stage "tally" %}
