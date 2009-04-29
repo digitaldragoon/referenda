@@ -1,5 +1,5 @@
 {% load markup %}
-<h2>{{ race.name }} (choose {{ race.num_choices }})</h2>
+<h2>{{ race.name }}<br /><span class="grey">choose {{ race.num_choices }}</span></h2>
 {{ race.description|textile }}
 <p>Make up to {{ race.num_choices}} choice{{ race.num_choices|pluralize }}.</p>
 <ul>
