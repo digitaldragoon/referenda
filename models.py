@@ -315,6 +315,7 @@ class Race (models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField()
     election = models.ForeignKey(Election, related_name="races")
+    allow_writeins = models.BooleanField('Allow write-in candidates?', default=True)
     num_choices = models.PositiveIntegerField(default=1)
     rank = models.PositiveIntegerField()
     description = models.TextField(blank=True, help_text="Description which will appear at the top of the ballot for this race.")

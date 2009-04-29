@@ -8,8 +8,10 @@
     {% include "referenda/candidate.html" %}
     {% endfor %}
     {% endif %}
+    {% if race.allow_writeins %}
     {% for num in race.num_choices_iter %}
     {% include "referenda/writeincandidate.html" %}
     {% endfor %}
+    {% endif %}
 </ul>
 <a class="button castvote">Cast vote</a>
