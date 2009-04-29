@@ -15,7 +15,7 @@
         {% for race in races %}
         <dt>{{ race.name }}</dt>
         {% for candidate in race.votes %}
-        <dd><div class="tally-bar"><div class="bar" style="width: {{ candidate.3 }}%;"></div></div>{{ candidate.0 }} ({{ candidate.1 }} votes, {{ candidate.3 }}%)</dd>
+        <dd><div class="tally-bar"><div class="bar" style="width: {{ candidate.3 }}%;"></div></div>{{ candidate.0 }} ({{ candidate.1 }} votes, {{ candidate.2 }}%)</dd>
         {% endfor %}
         {% endfor %}
         {% else %}

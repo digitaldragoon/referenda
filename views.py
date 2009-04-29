@@ -35,7 +35,7 @@ def election_detail (request, slug):
 
                 race.votes = sorted(tallydict.items(), key=operator.itemgetter(1))
                 race.votes.reverse()
-                race.votes = [(x[0], x[1], x[1]/float(total)*100, int(x[1]/float(total)*100)) for x in race.votes]
+                race.votes = [(x[0], x[1], round(x[1]/float(total)*100, 2), int(x[1]/float(total)*100)) for x in race.votes]
 
         return render_to_response('referenda/election_detail.html',
                                   locals(),
