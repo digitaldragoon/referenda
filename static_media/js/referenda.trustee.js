@@ -45,6 +45,9 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
                 REFERENDA.TRUSTEE.CONTROL.navigateToNavPane();
             });
 
+
+        var tallybutton = $('<a class="button tally">Tally Now</a>');
+
         $('#secretkey').keyup(function(e) {
                 if (e.keyCode != 8 && e.keyCode != 46) {
                     try {
@@ -54,10 +57,10 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
                         return;
                     }
 
-                    var tallybutton = $('<a class="button tally">Tally Now</a>');
                     tallybutton.click(function() {REFERENDA.TRUSTEE.CONTROL.tallyVotes();});
-                    $('#secretkey').css('display', 'none');
-                    $('#tally-pane .center').append(tallybutton);
+                    $('#secretkey').fadeOut('normal', function() {
+                                $('#tally-pane .center').append(tallybutton);
+                            });
 
                 }
             });
@@ -188,14 +191,16 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
     navigateToPane: function(pane_id) {
         //$('#' + this.currentPane).css('display', 'none');    
         //$('#' + pane_id).css('display', 'block');
-        $('#' + this.currentPane).slideLeftHide();
-        $(document).oneTime(200, undefined, function() {$('#' + pane_id).slideRightShow() });
+        $('#' + this.currentPane).hide('blind', {direction: 'vertical'}, 500);
+        $('#' + pane_id).show('blind', {direction: 'vertical'}, 500);
         this.currentPane = pane_id;
     },
 
     navigateToNavPane: function() {
-        $('#' + this.currentPane).slideRightHide();
-        $(document).oneTime(200, undefined, function() {$('#nav-pane').slideLeftShow();});
+        //$('#' + this.currentPane).css('display', 'none');    
+        //$('#nav-pane').css('display', 'block');
+        $('#' + this.currentPane).hide('blind', {direction: 'vertical'}, 500);
+        $('#nav-pane').show('blind', {direction: 'vertical'}, 500);
         this.currentPane = 'nav-pane';
     },
 
@@ -272,10 +277,13 @@ REFERENDA.TRUSTEE.Controller = Class.extend({
                 data: request_data,
                 dataType: 'json',
                 success: function(data) {
-                    REFERENDA.TRUSTEE.CONTROL.displayMessage(data);
+                    REFERENDA.TRUSTEE.CONTROL.displayMessage('This election has been successfully tallied.',
+                        function() {
+                            window.location = '..';
+                        });
                 },
                 error: function(data) {
-                    REFERENDA.TRUSTEE.CONTROL.displayMessage('error!');
+                    REFERENDA.TRUSTEE.CONTROL.displayMessage('The server encountered an error while tallying the vote. If the problem persists, please <a href="..">contact the administrator</a>.');
                 }
             });
     }

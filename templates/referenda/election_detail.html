@@ -20,6 +20,7 @@
         {% endfor %}
         {% else %}
         {% for race in election.races.all %}
+        <dt>{{ race.name }}</dt>
         <dd>{% for candidate in race.candidates.all %}{% if forloop.first %}{% else %}, {% endif %}{{ candidate.full_name }}{% endfor %}</dd>
         {% endfor %}
         {% endif %}
